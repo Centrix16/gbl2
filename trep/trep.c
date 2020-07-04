@@ -23,7 +23,7 @@ char *err_messages[] = {
 int main() {
 	init_unit(&root, NULL);	
 
-	interpret("sample.trep");
+	interpret("io.trep");
 
 	if (root.child_num) {
 		crawl_tree(&root, exec);
