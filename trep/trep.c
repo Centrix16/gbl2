@@ -20,10 +20,15 @@ char *err_messages[] = {
 	"the heir does not have a parent, reminder: fun (some-fun-arg) \"some fun arg text\""
 };
 
-int main() {
+int main(int argc, char *argv[]) {
+	if (argc < 2) {
+		printf("%s: %s <file>\n", argv[0], argv[0]);
+		exit(0);
+	}
+
 	init_unit(&root, NULL);	
 
-	interpret("io.trep");
+	interpret(argv[1]);
 
 	if (root.child_num) {
 		crawl_tree(&root, exec);
