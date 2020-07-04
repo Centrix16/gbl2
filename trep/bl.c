@@ -61,10 +61,36 @@ int is_str(char *tok) {
 	return strchr(tok, '\"') ? 1 : 0;	
 }
 
+char *del_sym(char *str, int symbol) {
+	static char buf[256] = "";
+	int i, j;
+
+	for (i = 0, j = 0; str[i] && j < 256; i++) {
+		if (str[i] != symbol)
+			buf[j++] = str[i];
+	}
+	buf[i] = '\0';
+	return buf;
+}
+
 /* lang functions */
 
 void output(unit *uptr) {
-	if ()	
+	char *tmp = NULL;
+	FILE *stream = stdout;
+	int i = 0;
+
+	tmp = get_child(uptr, 0)->value;
+	if (!is_str(tmp)) {
+		if (!strcmp(tmp, "out"))
+			; // stream = stdout
+		else if (!strcmp(tmp, "in"))
+			stream = stdin;
+		else if (!strcmp(tmp, "err"))
+			stream = stderr;	
+
+		i = 1; // first - stream
+	}
 	for (; i < uptr->child_num; i++)
-		puts(get_child(uptr, i)->value);	
+		fputs(del_sym(get_child(uptr, i)->value, '\"'), stream);	
 }
