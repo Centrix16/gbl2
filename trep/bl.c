@@ -69,7 +69,7 @@ char *del_sym(char *str, int symbol) {
 		if (str[i] != symbol)
 			buf[j++] = str[i];
 	}
-	buf[i] = '\0';
+	buf[j] = '\0';
 	return buf;
 }
 
@@ -91,6 +91,16 @@ void output(unit *uptr) {
 
 		i = 1; // first - stream
 	}
-	for (; i < uptr->child_num; i++)
-		fputs(del_sym(get_child(uptr, i)->value, '\"'), stream);	
+	for (; i < uptr->child_num; i++) {
+		tmp = get_child(uptr, i)->value;	
+
+		if (is_str(tmp))
+			fputs(del_sym(get_child(uptr, i)->value, '\"'), stream);	
+		else {
+			if (!strcmp(tmp, "~n"))
+				fputc('\n', stream);
+			else if (!strcmp(tmp, "~t"))
+				fputc('\t', stream);
+		}
+	}
 }
