@@ -1,0 +1,6 @@
+def (pif)(a b) "
+	return (sqrt (+ (pow (a)(2)) (pow (b)(2))))
+"
+
+pif (3)(4)
+output "Hello, world!" "second token" "third token"
