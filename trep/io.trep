@@ -1,1 +1,3 @@
-output (err) "Hi!"
+let (a)(7890) (var)("Hello!")
+
+output "a = " (a) (~n) "var = " (var) (~n)
