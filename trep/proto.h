@@ -25,6 +25,19 @@ typedef struct __unit__ {
 	struct __unit__ *child[CHILD_MAX];
 } unit;
 
+typedef struct __var__ {
+	char *name;
+	char *value;
+} var;
+
+typedef struct __elm__ {
+	var *heap;
+	char *tag;
+	int var_indx;
+	struct __elm__ *prev;
+	struct __elm__ *next;
+} elm;
+
 /* trep.c */
 void error(int, int, char*);
 void interpret(char *filename);
@@ -34,19 +47,36 @@ void tree_builder(char *, int, unit *);
 /* tree.c */
 void init_unit(unit *, unit *);
 void new_child(unit *);
-void set_value(unit *dst_unit, char *new_value);
-unit *get_child(unit *parent, int child_index);
-void set_end(unit *uptr);
-int is_end_unit(unit *uptr);
-void crawl_tree(unit *parent, void (*func)(unit*));
-void show_tree(unit *uptr);
-void del_tree(unit *uptr);
-int get_i(unit *dst);
-void refresh_unit(unit *uptr);
+void set_value(unit *, char *);
+unit *get_child(unit *, int);
+void set_end(unit *);
+int is_end_unit(unit *);
+void crawl_tree(unit *, void (*)(unit*));
+void show_tree(unit *);
+void del_tree(unit *);
+int get_i(unit *);
+void refresh_unit(unit *);
 
 /* bl.c */
-void exec(unit *uptr);
-void output(unit *uptr);
+void exec(unit *);
+void output(unit *),
+	 let(unit *);
+
+/* var.c */
+var *new_var_area(int);
+void init_var(var *, int, char *, char *);
+void init_var_stack(elm *stack, char *name, char *val);
+void del_var_area(var *);
+void crawl_heap(var *, void (*)(var *));
+void show_var(var *);
+char *get_var_value_stack(elm *stack, int indx);
+
+/* stack.c */
+void init_elm(elm *, elm *);
+void add_next(elm *);
+void del_elm(elm *);
+void crawl_stack(elm *, void (*)(elm*));
+void show_elm(elm *);
 
 enum error_types {
 	space_between_parent_and_child = 0,
