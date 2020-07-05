@@ -1,7 +1,7 @@
 /*
  * bl.c -- base library of trep language
- * v0.0
- * 30.06.2020
+ * v0.2
+ * 05.07.2020
  * by asz
  */
 
@@ -9,13 +9,16 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output"};
-void (*built_in_funcs[])(unit*) = {output};
+#define BUILT_LEN 2
+
+char *built_in[] = {"output", "let"};
+void (*built_in_funcs[])(unit*) = {output, let};
+extern elm *var_stack;
 
 /* service functions */
 
 int find_s(char **arr, char *str) {
-	for (int i = 0; i < sizeof(arr) / sizeof(char*); i++) {
+	for (int i = 0; i < BUILT_LEN; i++) {
 		if (!strcmp(arr[i], str)) {
 			return i;
 		}
@@ -28,11 +31,17 @@ int is_built_in(char *tok) {
 }
 
 int is_variable(char *tok) {
-	return 0;
+	var *vptr = var_stack->heap;
+
+	for (int i = 0; vptr[i].name; i++) {
+		if (!strcmp(vptr[i].name, tok))
+			return i;
+	}
+	return -1;
 }
 
 int is_user_func(char *tok) {
-	return 0;	
+	return -1;	
 }
 
 void exec(unit *uptr) {
@@ -46,7 +55,7 @@ void exec(unit *uptr) {
 
 	result = is_variable(uptr->value);
 	if (result > -1) {
-		// code for variable
+		strcpy(uptr->value, get_var_value_stack(var_stack, result));	
 		return ;
 	}
 
@@ -88,19 +97,31 @@ void output(unit *uptr) {
 			stream = stdin;
 		else if (!strcmp(tmp, "err"))
 			stream = stderr;	
+		else
+			fputs(tmp, stream);
 
 		i = 1; // first - stream
 	}
 	for (; i < uptr->child_num; i++) {
 		tmp = get_child(uptr, i)->value;	
 
-		if (is_str(tmp))
+		if (!strcmp(tmp, "~n"))
+			fputc('\n', stream);
+		else if (!strcmp(tmp, "~t"))
+			fputc('\t', stream);
+		else
 			fputs(del_sym(get_child(uptr, i)->value, '\"'), stream);	
-		else {
-			if (!strcmp(tmp, "~n"))
-				fputc('\n', stream);
-			else if (!strcmp(tmp, "~t"))
-				fputc('\t', stream);
-		}
+	}
+}
+
+void let(unit *uptr) {
+	char *name = NULL;
+	char *value = NULL;
+
+	for (int i = 0; i < uptr->child_num; i += 2) {
+		name = get_child(uptr, i)->value;
+		value = get_child(uptr, i+1)->value;
+
+		init_var_stack(var_stack, name, value);
 	}
 }
