@@ -11,8 +11,6 @@
 
 #include "proto.h"
 
-int enclosure = 0;
-
 void init_unit(unit *uptr, unit *new_parent) {
 	uptr->child_num = 0;
 	uptr->i = 0;
@@ -75,22 +73,20 @@ void crawl_tree(unit *parent, void (*func)(unit*)) {
 	if (!uptr)
 		return ;
 
-	(*func)(uptr);
 	if (is_end_unit(uptr)) {
+		(*func)(uptr);
 		return ;
 	}
 
-	for (int i = 0; i < uptr->child_num; i++) {
-		enclosure++;	
+	for (int i = 0; i < uptr->child_num; i++)
 		crawl_tree(get_child(uptr, i), func);
-		enclosure--;
-	}
+	(*func)(uptr);
 }
 
 
 void show_tree(unit *uptr) {
 	if (uptr)
-		printf("%*c%s\n", enclosure+1, ' ', uptr->value);
+		puts(uptr->value);
 }
 
 void del_tree(unit *uptr) {
@@ -115,21 +111,3 @@ void refresh_unit(unit *uptr) {
 	uptr->child[0] = NULL;
 	strcpy(uptr->value, "\0");
 }
-
-/*int main() {
-	char names[][16] = {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"};	
-	unit root;
-
-	init_unit(&root, NULL);
-
-	for (int i = 0; i < 10; i++) {
-		new_child(&root);
-		set_value(get_child(&root, i), names[i]);
-	}
-	new_child(get_child(&root, 0));
-	set_value(get_child(get_child(&root, 0), 0), "q");
-
-	crawl_tree(&root, show_tree);
-	crawl_tree(&root, del_tree);
-	return 0;
-}*/
