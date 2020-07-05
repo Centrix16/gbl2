@@ -13,6 +13,9 @@
 #include "proto.h"
 
 unit root;
+elm bottom, *var_stack;
+var *heap;
+
 int line = 1;
 
 char *err_messages[] = {
@@ -26,6 +29,11 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
+	heap = new_var_area(256);
+	init_elm(&bottom, NULL);
+	var_stack = &bottom;
+	var_stack->heap = heap;
+
 	init_unit(&root, NULL);	
 
 	interpret(argv[1]);
@@ -33,7 +41,10 @@ int main(int argc, char *argv[]) {
 	if (root.child_num) {
 		crawl_tree(&root, exec);
 	}
+
 	crawl_tree(&root, del_tree);
+	crawl_stack(&bottom, del_elm);
+	del_var_area(heap);
 	return 0;
 }
 
@@ -278,7 +289,7 @@ void tree_builder(char *token, int type, unit *uptr) {
 	if (type == PARENT) {
 		if (is_parent && !nesting) {
 			//crawl_tree(uptr, show_tree);
-			crawl_tree(uptr, exec);
+			crawl_tree(&root, exec);
 			crawl_tree(&root, del_tree);
 			refresh_unit(&root);
 
