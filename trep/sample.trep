@@ -4,3 +4,4 @@ def (pif)(a b) "
 
 pif (3)(4)
 output "Hello, world!" (~n) "second token" (~t) "third token"
+reta "q"
