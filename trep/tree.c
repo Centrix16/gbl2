@@ -16,6 +16,8 @@ void init_unit(unit *uptr, unit *new_parent) {
 	uptr->i = 0;
 	uptr->parent = new_parent;
 	uptr->is_free = 0;
+	uptr->eval_me = 1;
+
 	strcpy(uptr->value, "\0");
 
 	for (int i = 0; i < CHILD_MAX; i++) {
@@ -46,8 +48,8 @@ void new_child(unit *parent) {
 }
 
 void set_value(unit *uptr, char *new_value) {
-	sprintf(uptr->value, "%s", new_value);	
-//	strcpy(uptr->value, new_value);
+//	sprintf(uptr->value, "%s", new_value);	
+	strcpy(uptr->value, new_value);
 }
 
 unit *get_child(unit *parent, int child_index) {
@@ -95,6 +97,7 @@ void del_tree(unit *uptr) {
 		uptr->child_num = 0;
 		uptr->i = 0;
 		uptr->is_free = 1;
+		uptr->eval_me = 0;
 		strcpy(uptr->value, "\0");
 
 		free(uptr);
@@ -109,5 +112,6 @@ void refresh_unit(unit *uptr) {
 	uptr->i = 0;
 	uptr->child_num = 0;
 	uptr->child[0] = NULL;
+	uptr->eval_me = 1;
 	strcpy(uptr->value, "\0");
 }
