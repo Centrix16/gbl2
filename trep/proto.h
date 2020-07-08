@@ -1,6 +1,5 @@
 /*
  * proto.h -- main header file
- * v0.0
  * 30.06.2020
  * by asz
  */
@@ -17,7 +16,8 @@
 #define CHILD 1
 
 typedef struct __unit__ {
-	char value[256];
+	char value[LEN];
+	int eval_me;
 	int child_num;
 	int i;
 	int is_free;
@@ -60,7 +60,10 @@ void refresh_unit(unit *);
 /* bl.c */
 void exec(unit *);
 void output(unit *),
-	 let(unit *);
+	 let(unit *),
+	 no_eval(unit *),
+	 input(unit *uptr),
+	 comment(unit *uptr);
 
 /* var.c */
 var *new_var_area(int);
@@ -70,6 +73,7 @@ void del_var_area(var *);
 void crawl_heap(var *, void (*)(var *));
 void show_var(var *);
 char *get_var_value_stack(elm *stack, int indx);
+var *get_var_stack(elm *stack, int indx);
 
 /* stack.c */
 void init_elm(elm *, elm *);
