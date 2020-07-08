@@ -1,3 +1,16 @@
+~ "This is sample of let"
+~ "output (HI!)"
+
 let (a)(7890) (var)("Hello!")
+let (c)(a)
 
 output "a = " (a) (~n) "var = " (var) (~n)
+output "c = a = " (c) (~n)
+
+let (; (a))(5)
+let (; (var))("New value!")
+let (; (c))(123)
+
+output "new a = " (a) (~n)
+output "new var = " (var) (~n)
+output "new c = " (c) (~n)
