@@ -1,7 +1,7 @@
 /*
  * var.c -- variable library for trep interpreter
- * v0.1
- * 05.07.2020
+ * v0.2
+ * 08.07.2020
  * by asz
  */
 
@@ -29,8 +29,8 @@ void free_var_area(var *vptr) {
 }
 
 void init_var(var *vptr, int indx, char *name, char *val) {
-	vptr[indx].name = calloc(strlen(name), sizeof(char));
-	vptr[indx].value = calloc(strlen(val), sizeof(char));
+	vptr[indx].name = calloc((strlen(name)+1), sizeof(char));
+	vptr[indx].value = calloc((strlen(val)+1), sizeof(char));
 
 	strcpy(vptr[indx].name, name);
 	strcpy(vptr[indx].value, val);
@@ -74,6 +74,10 @@ void show_var(var *vptr) {
 
 char *get_var_value_stack(elm *stack, int indx) {
 	return stack->heap[indx].value;
+}
+
+var *get_var_stack(elm *stack, int indx) {
+	return &stack->heap[indx];	
 }
 
 /*int main() {
