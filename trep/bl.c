@@ -1,18 +1,19 @@
 /*
  * bl.c -- base library of trep language
- * v0.2
- * 05.07.2020
+ * v0.3
+ * 08.07.2020
  * by asz
  */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "proto.h"
 
-#define BUILT_LEN 2
+#define BUILT_LEN 5
 
-char *built_in[] = {"output", "let"};
-void (*built_in_funcs[])(unit*) = {output, let};
+char *built_in[] = {"output", "let", ";", "input", "~"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment};
 extern elm *var_stack;
 
 /* service functions */
@@ -47,6 +48,12 @@ int is_user_func(char *tok) {
 void exec(unit *uptr) {
 	int result = 0;
 
+	if (!uptr->eval_me)
+		return ;
+
+	if (uptr->parent && !strcmp(uptr->parent->value, ";"))
+		return ;
+
 	result = is_built_in(uptr->value);
 	if (result > -1) {
 		(*built_in_funcs[result])(uptr);
@@ -55,14 +62,14 @@ void exec(unit *uptr) {
 
 	result = is_variable(uptr->value);
 	if (result > -1) {
-		strcpy(uptr->value, get_var_value_stack(var_stack, result));	
+		strcpy(uptr->value, get_var_value_stack(var_stack, result));
 		return ;
 	}
 
 	result = is_user_func(uptr->value);
 	if (result > -1) {
 		// code for user func
-		return ;	
+		return ;
 	}
 }
 
@@ -117,11 +124,50 @@ void output(unit *uptr) {
 void let(unit *uptr) {
 	char *name = NULL;
 	char *value = NULL;
+	int result = 0;
+	var *vptr = NULL;
 
 	for (int i = 0; i < uptr->child_num; i += 2) {
 		name = get_child(uptr, i)->value;
 		value = get_child(uptr, i+1)->value;
 
-		init_var_stack(var_stack, name, value);
+		result = is_variable(name);
+		if (result > -1) {
+			vptr = get_var_stack(var_stack, result);
+
+			free(vptr->value);
+			vptr->value = malloc(strlen(value)+1);
+			strcpy(vptr->value, value);
+		}
+		else
+			init_var_stack(var_stack, name, value);
 	}
+}
+
+void no_eval(unit *uptr) {
+	strcpy(uptr->value, uptr->child[0]->value);	
+	uptr->eval_me = 0;
+}
+
+void input(unit *uptr) {
+	FILE *stream = stdin;
+	char *tmp = NULL;
+
+	if (uptr->child_num) {
+		tmp = get_child(uptr, 0)->value;
+
+		if (!strcmp(tmp, "out"))
+			stream = stdout;
+		else if (!strcmp(tmp, "in"))
+			stream = stdin;
+		else if (!strcmp(tmp, "err"))
+			stream = stderr;
+	}
+
+	fgets(uptr->value, LEN, stream);
+	strcpy(uptr->value, del_sym(uptr->value, '\n'));
+}
+
+void comment(unit *uptr) {
+
 }
