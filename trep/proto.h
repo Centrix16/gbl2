@@ -43,6 +43,7 @@ void error(int, int, char*);
 void interpret(char *filename);
 void pars(FILE *, char *, unit *);
 void tree_builder(char *, int, unit *);
+void set_is_parent(int new);
 
 /* tree.c */
 void init_unit(unit *, unit *);
@@ -63,7 +64,8 @@ void output(unit *),
 	 let(unit *),
 	 no_eval(unit *),
 	 input(unit *uptr),
-	 comment(unit *uptr);
+	 comment(unit *uptr),
+	 quit(unit *uptr);
 
 /* var.c */
 var *new_var_area(int);
