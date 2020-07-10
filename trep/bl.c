@@ -13,7 +13,7 @@
 #define BUILT_LEN 6
 
 char *built_in[] = {"output", "let", "+", "-", "*", "/", ";", "input", "~", "exit"};
-void (*built_in_funcs[])(unit*) = {output, let, sum, sub, mul, div, no_eval, input, comment, quit};
+void (*built_in_funcs[])(unit*) = {output, let, sum, sub, mul, divop, no_eval, input, comment, quit};
 extern elm *var_stack;
 
 /* service functions */
@@ -204,7 +204,7 @@ void mul(unit *uptr) {
 	strcpy(uptr->value, result_str);
 }
 
-void div(unit *uptr) {
+void divop(unit *uptr) {
 	int result = 0;
 	char result_str[64] = "";
 
