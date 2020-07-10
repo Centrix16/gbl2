@@ -1,11 +1,15 @@
+ct = gcc
+flags = -O0 -g -o
+src = trep.c bl.c tree.c var.c stack.c
+
 all:
-	gcc -O0 -g -o ti trep.c bl.c tree.c var.c stack.c
+	$(ct) $(flags) ti $(src)
 
 tree:
-	gcc -O0 -g -o t tree.c
+	$(ct) $(flags) t tree.c
 
 var:
-	gcc -O0 -g -o v var.c
+	$(ct) $(flags) v var.c
 
 stack:
-	gcc -O0 -g -o s stack.c
+	$(ct) $(flags) s stack.c
