@@ -168,6 +168,56 @@ void input(unit *uptr) {
 	strcpy(uptr->value, del_sym(uptr->value, '\n'));
 }
 
+void sum(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	for (int i = 0; i < uptr->child_num; i++)
+		result += atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void sub(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	if (uptr->child_num > 1)
+		result = atoi(get_child(uptr, 0)->value);
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result -= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void mul(unit *uptr) {
+	int result = 1;
+	char result_str[64] = "";
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result *= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void div(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	if (uptr->child_num > 1)
+		result = atoi(get_child(uptr, 0)->value);
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result /= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
 void comment(unit *uptr) { ; }
 
 void quit(unit *uptr) {
