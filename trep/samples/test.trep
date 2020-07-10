@@ -1,0 +1,4 @@
+let (name)("User") ~ "variable creation"
+output "Enter your name: "
+let (; (name))(input)
+output "Hello, " (name) (~n)
