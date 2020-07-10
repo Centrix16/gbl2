@@ -10,10 +10,10 @@
 
 #include "proto.h"
 
-#define BUILT_LEN 5
+#define BUILT_LEN 6
 
-char *built_in[] = {"output", "let", ";", "input", "~"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit};
 extern elm *var_stack;
 
 /* service functions */
@@ -168,6 +168,9 @@ void input(unit *uptr) {
 	strcpy(uptr->value, del_sym(uptr->value, '\n'));
 }
 
-void comment(unit *uptr) {
+void comment(unit *uptr) { ; }
 
+void quit(unit *uptr) {
+	if (uptr->child_num)
+		exit(atoi(get_child(uptr, 0)->value));
 }
