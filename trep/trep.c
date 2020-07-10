@@ -285,13 +285,17 @@ int is_complex_token(char *tok) {
 
 int nesting = 0, is_parent = 0;
 
+void set_is_parent(int new) {
+	is_parent = new;
+}
+
 void tree_builder(char *token, int type, unit *uptr) {
 	if (type == PARENT) {
 		if (is_parent && !nesting) {
 			//crawl_tree(uptr, show_tree);
-			crawl_tree(&root, exec);
-			crawl_tree(&root, del_tree);
-			refresh_unit(&root);
+			crawl_tree(uptr, exec);
+			crawl_tree(uptr, del_tree);
+			refresh_unit(uptr);
 
 			set_value(uptr, token);
 		}
