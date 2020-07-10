@@ -67,7 +67,7 @@ void output(unit *),
 	 sum(unit *uptr),
 	 sub(unit *uptr),
 	 mul(unit *uptr),
-	 div(unit *uptr),
+	 divop(unit *uptr),
 	 comment(unit *uptr),
 	 quit(unit *uptr);
 
