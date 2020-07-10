@@ -65,6 +65,7 @@ void output(unit *),
 	 no_eval(unit *),
 	 input(unit *uptr),
 	 comment(unit *uptr),
+	 eval(unit *uptr),
 	 quit(unit *uptr);
 
 /* var.c */
