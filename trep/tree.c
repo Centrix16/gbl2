@@ -30,7 +30,7 @@ void new_child(unit *parent) {
 	unit *uptr = NULL;
 
 	if (child_index > CHILD_MAX) {
-		fprintf(stderr, "%s: too many childs\n", __func__);
+		fprintf(stderr, "%s: too many childs, i = %d\n", __func__, child_index);
 		exit(0);
 	}
 
@@ -44,7 +44,6 @@ void new_child(unit *parent) {
 	init_unit(parent->child[child_index], parent);
 	parent->child_num++;
 	parent->i++;
-	strcpy(parent->child[child_index]->value, "\0");
 }
 
 void set_value(unit *uptr, char *new_value) {
