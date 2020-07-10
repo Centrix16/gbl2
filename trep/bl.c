@@ -10,10 +10,10 @@
 
 #include "proto.h"
 
-#define BUILT_LEN 6
+#define BUILT_LEN 7
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "eval"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, eval};
 extern elm *var_stack;
 
 /* service functions */
@@ -173,4 +173,23 @@ void comment(unit *uptr) { ; }
 void quit(unit *uptr) {
 	if (uptr->child_num)
 		exit(atoi(get_child(uptr, 0)->value));
+}
+
+void eval(unit *uptr) {
+	char tmp_buf[256] = "";
+
+	if (uptr->child_num) {
+		uptr->i = 0;
+		uptr->child_num = 0;
+		uptr->eval_me = 1;
+
+		strcpy(tmp_buf, uptr->value);
+		strcpy(uptr->value, "\0");
+
+		del_tree(get_child(uptr, 0));
+
+		set_is_parent(0);
+		pars(NULL, tmp_buf, uptr);
+		crawl_tree(uptr, show_tree);
+	}
 }
