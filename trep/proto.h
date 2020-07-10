@@ -64,6 +64,10 @@ void output(unit *),
 	 let(unit *),
 	 no_eval(unit *),
 	 input(unit *uptr),
+	 sum(unit *uptr),
+	 sub(unit *uptr),
+	 mul(unit *uptr),
+	 div(unit *uptr),
 	 comment(unit *uptr),
 	 quit(unit *uptr);
 
