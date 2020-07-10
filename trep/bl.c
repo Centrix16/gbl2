@@ -12,8 +12,8 @@
 
 #define BUILT_LEN 6
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit};
+char *built_in[] = {"output", "let", "+", "-", "*", "/", ";", "input", "~", "exit"};
+void (*built_in_funcs[])(unit*) = {output, let, sum, sub, mul, div, no_eval, input, comment, quit};
 extern elm *var_stack;
 
 /* service functions */
