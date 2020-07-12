@@ -12,14 +12,14 @@
 
 #define BUILT_LEN 7
 
-char *built_in[] = {"output", "let", "+", "-", "*", "/", ";", "input", "~", "exit"};
-void (*built_in_funcs[])(unit*) = {output, let, sum, sub, mul, divop, no_eval, input, comment, quit};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
 extern elm *var_stack;
 
 /* service functions */
 
 int find_s(char **arr, char *str) {
-	for (int i = 0; i < BUILT_LEN; i++) {
+	for (int i = 0; i < sizeof(built_in) / sizeof(char*); i++) {
 		if (!strcmp(arr[i], str)) {
 			return i;
 		}
@@ -197,7 +197,7 @@ void mul(unit *uptr) {
 	int result = 1;
 	char result_str[64] = "";
 
-	for (int i = 1; i < uptr->child_num; i++)
+	for (int i = 0; i < uptr->child_num; i++)
 		result *= atoi(get_child(uptr, i)->value);
 
 	sprintf(result_str, "%d", result);
