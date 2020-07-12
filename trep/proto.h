@@ -1,6 +1,6 @@
 /*
  * proto.h -- main header file
- * 30.06.2020
+ * 12.07.2020
  * by asz
  */
 
