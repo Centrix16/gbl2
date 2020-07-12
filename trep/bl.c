@@ -173,7 +173,7 @@ void sum(unit *uptr) {
 	for (int i = 0; i < uptr->child_num; i++)
 		result += atof(get_child(uptr, i)->value);
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
 }
 
@@ -187,7 +187,7 @@ void sub(unit *uptr) {
 	for (int i = 1; i < uptr->child_num; i++)
 		result -= atof(get_child(uptr, i)->value);
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
 }
 
@@ -198,7 +198,7 @@ void mul(unit *uptr) {
 	for (int i = 0; i < uptr->child_num; i++)
 		result *= atof(get_child(uptr, i)->value);
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
 }
 
@@ -212,7 +212,7 @@ void divop(unit *uptr) {
 	for (int i = 1; i < uptr->child_num; i++)
 		result /= atof(get_child(uptr, i)->value);
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
 }
 
