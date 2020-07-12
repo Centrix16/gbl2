@@ -167,7 +167,7 @@ void input(unit *uptr) {
 }
 
 void sum(unit *uptr) {
-	int result = 0;
+	double result = 0;
 	char result_str[64] = "";
 
 	for (int i = 0; i < uptr->child_num; i++)
@@ -178,7 +178,7 @@ void sum(unit *uptr) {
 }
 
 void sub(unit *uptr) {
-	int result = 0;
+	double result = 0;
 	char result_str[64] = "";
 
 	if (uptr->child_num > 1)
@@ -192,7 +192,7 @@ void sub(unit *uptr) {
 }
 
 void mul(unit *uptr) {
-	int result = 1;
+	double result = 1;
 	char result_str[64] = "";
 
 	for (int i = 0; i < uptr->child_num; i++)
@@ -203,7 +203,7 @@ void mul(unit *uptr) {
 }
 
 void divop(unit *uptr) {
-	int result = 0;
+	double result = 0;
 	char result_str[64] = "";
 
 	if (uptr->child_num > 1)
