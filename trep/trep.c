@@ -20,7 +20,9 @@ int line = 1;
 
 char *err_messages[] = {
 	"there should be a space between the parent and the heir: parent (heir)",
-	"the heir does not have a parent, reminder: fun (some-fun-arg) \"some fun arg text\""
+	"the heir does not have a parent, reminder: fun (some-fun-arg) \"some fun arg text\"",
+	"expected int",
+	"division by zero detected"
 };
 
 int main(int argc, char *argv[]) {
