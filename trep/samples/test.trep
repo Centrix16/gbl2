@@ -1,3 +1,6 @@
+let (age)(7)
++ (age)(5)
+output "7+5=" (+ (age)(5)) (~n)
 let (name)("User") ~ "variable creation"
 output "Enter your name: "
 let (; (name))(input)
