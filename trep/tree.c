@@ -87,7 +87,7 @@ void crawl_tree(unit *parent, void (*func)(unit*)) {
 
 void show_tree(unit *uptr) {
 	if (uptr)
-		puts("%s: ", __func__, uptr->value);
+		printf("%s: ", __func__, uptr->value);
 }
 
 void del_tree(unit *uptr) {
