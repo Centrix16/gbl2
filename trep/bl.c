@@ -1,7 +1,7 @@
 /*
  * bl.c -- base library of trep language
- * v0.3
- * 08.07.2020
+ * v0.5
+ * 12.07.2020
  * by asz
  */
 
@@ -9,8 +9,6 @@
 #include <stdlib.h>
 
 #include "proto.h"
-
-#define BUILT_LEN 7
 
 char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
 void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
