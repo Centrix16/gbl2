@@ -12,8 +12,8 @@
 
 #define BUILT_LEN 7
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "eval"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, eval};
+char *built_in[] = {"output", "let", "+", "-", "*", "/", ";", "input", "~", "exit"};
+void (*built_in_funcs[])(unit*) = {output, let, sum, sub, mul, divop, no_eval, input, comment, quit};
 extern elm *var_stack;
 
 /* service functions */
@@ -166,6 +166,56 @@ void input(unit *uptr) {
 
 	fgets(uptr->value, LEN, stream);
 	strcpy(uptr->value, del_sym(uptr->value, '\n'));
+}
+
+void sum(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	for (int i = 0; i < uptr->child_num; i++)
+		result += atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void sub(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	if (uptr->child_num > 1)
+		result = atoi(get_child(uptr, 0)->value);
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result -= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void mul(unit *uptr) {
+	int result = 1;
+	char result_str[64] = "";
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result *= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void divop(unit *uptr) {
+	int result = 0;
+	char result_str[64] = "";
+
+	if (uptr->child_num > 1)
+		result = atoi(get_child(uptr, 0)->value);
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result /= atoi(get_child(uptr, i)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
 }
 
 void comment(unit *uptr) { ; }
