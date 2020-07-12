@@ -179,17 +179,18 @@ void eval(unit *uptr) {
 	char tmp_buf[256] = "";
 
 	if (uptr->child_num) {
-		uptr->i = 0;
-		uptr->child_num = 0;
-		uptr->eval_me = 1;
-
-		strcpy(tmp_buf, uptr->value);
+		strcpy(tmp_buf, get_child(uptr, 0)->value);
 		strcpy(uptr->value, "\0");
 
 		del_tree(get_child(uptr, 0));
 
+		uptr->i = 0;
+		uptr->child_num = 0;
+		uptr->eval_me = 1;
+
 		set_is_parent(0);
 		pars(NULL, tmp_buf, uptr);
-		crawl_tree(uptr, show_tree);
+		//crawl_tree(uptr, show_tree);
+		crawl_tree(uptr, exec);
 	}
 }
