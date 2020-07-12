@@ -8,11 +8,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "pow", "eval"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, powop, eval};
 
 extern elm *var_stack;
 extern int line;
@@ -252,6 +253,20 @@ void divop(unit *uptr) {
 
 		result /= tmp;
 	}
+
+	sprintf(result_str, "%g", result);
+	strcpy(uptr->value, result_str);
+}
+
+void powop(unit *uptr) {
+	double result = 1;
+	char result_str[64] = "";
+
+	if (uptr->child_num > 1)
+		result = atof(get_child(uptr, 0)->value);
+
+	for (int i = 1; i < uptr->child_num; i++)
+		result = pow(result, atof(get_child(uptr, i)->value));
 
 	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);

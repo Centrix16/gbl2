@@ -68,6 +68,7 @@ void output(unit *),
 	 sub(unit *uptr),
 	 mul(unit *uptr),
 	 divop(unit *uptr),
+	 powop(unit *uptr),
 	 comment(unit *uptr),
 	 eval(unit *uptr),
 	 quit(unit *uptr);
