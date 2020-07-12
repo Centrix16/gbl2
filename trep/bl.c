@@ -1,18 +1,21 @@
 /*
  * bl.c -- base library of trep language
- * v0.5
+ * v0.6
  * 12.07.2020
  * by asz
  */
 
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "proto.h"
 
 char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
 void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
+
 extern elm *var_stack;
+extern int line;
 
 /* service functions */
 
@@ -87,6 +90,19 @@ char *del_sym(char *str, int symbol) {
 	return buf;
 }
 
+int is_int(char *str) {
+	char *sptr = str;	
+
+	while (*sptr) {
+		if (isdigit(*sptr) || *sptr == '.')
+			;
+		else
+			return 0;
+		sptr++;
+	}
+	return 1;
+}
+
 /* lang functions */
 
 void output(unit *uptr) {
@@ -117,6 +133,7 @@ void output(unit *uptr) {
 		else
 			fputs(del_sym(get_child(uptr, i)->value, '\"'), stream);	
 	}
+	strcpy(uptr->value, get_child(uptr, i-1)->value);
 }
 
 void let(unit *uptr) {
@@ -140,6 +157,7 @@ void let(unit *uptr) {
 		else
 			init_var_stack(var_stack, name, value);
 	}
+	strcpy(uptr->value, value);
 }
 
 void no_eval(unit *uptr) {
@@ -170,8 +188,11 @@ void sum(unit *uptr) {
 	double result = 0;
 	char result_str[64] = "";
 
-	for (int i = 0; i < uptr->child_num; i++)
+	for (int i = 0; i < uptr->child_num; i++) {
+		if (!is_int(get_child(uptr, i)->value))
+			error(line, expected_int, get_child(uptr, i)->value);
 		result += atof(get_child(uptr, i)->value);
+	}
 
 	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
@@ -181,11 +202,16 @@ void sub(unit *uptr) {
 	double result = 0;
 	char result_str[64] = "";
 
+	if (!is_int(get_child(uptr, 0)->value))
+			error(line, expected_int, get_child(uptr, 0)->value);
 	if (uptr->child_num > 1)
 		result = atof(get_child(uptr, 0)->value);
 
-	for (int i = 1; i < uptr->child_num; i++)
+	for (int i = 1; i < uptr->child_num; i++) {
+		if (!is_int(get_child(uptr, i)->value))
+			error(line, expected_int, get_child(uptr, i)->value);
 		result -= atof(get_child(uptr, i)->value);
+	}
 
 	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
@@ -195,22 +221,37 @@ void mul(unit *uptr) {
 	double result = 1;
 	char result_str[64] = "";
 
-	for (int i = 0; i < uptr->child_num; i++)
+	for (int i = 0; i < uptr->child_num; i++) {
+		if (!is_int(get_child(uptr, i)->value))
+			error(line, expected_int, get_child(uptr, i)->value);
 		result *= atof(get_child(uptr, i)->value);
+	}
 
 	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
 }
 
 void divop(unit *uptr) {
-	double result = 0;
+	double result = 0, tmp = 0;
 	char result_str[64] = "";
 
+	if (!is_int(get_child(uptr, 0)->value))
+			error(line, expected_int, get_child(uptr, 0)->value);
 	if (uptr->child_num > 1)
 		result = atof(get_child(uptr, 0)->value);
 
-	for (int i = 1; i < uptr->child_num; i++)
-		result /= atof(get_child(uptr, i)->value);
+	for (int i = 1; i < uptr->child_num; i++) {
+		if (!is_int(get_child(uptr, i)->value))
+			error(line, expected_int, get_child(uptr, i)->value);	
+
+		tmp = atof(get_child(uptr, i)->value);
+		if (!tmp) {
+			error(line, nil_div, get_child(uptr, i)->value);	
+			exit(0);
+		}
+
+		result /= tmp;
+	}
 
 	sprintf(result_str, "%g", result);
 	strcpy(uptr->value, result_str);
