@@ -92,6 +92,8 @@ void show_elm(elm *);
 enum error_types {
 	space_between_parent_and_child = 0,
 	not_parent,
+	expected_int,
+	nil_div
 };
 
 #endif
