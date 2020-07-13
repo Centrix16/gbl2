@@ -72,7 +72,8 @@ void output(unit *),
 	 comment(unit *uptr),
 	 eval(unit *uptr),
 	 quit(unit *uptr),
-	 more(unit *uptrl);
+	 more(unit *uptr),
+	 less(unit *uptr);
 
 /* var.c */
 var *new_var_area(int);
