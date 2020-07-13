@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "pow", "eval"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, powop, eval};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
 
 extern elm *var_stack;
 extern int line;
@@ -36,7 +36,7 @@ int is_built_in(char *tok) {
 int is_variable(char *tok) {
 	var *vptr = var_stack->heap;
 
-	for (int i = 0; vptr[i].name; i++) {
+	for (int i = 0; i < var_stack->var_indx; i++) {
 		if (!strcmp(vptr[i].name, tok))
 			return i;
 	}
@@ -158,7 +158,7 @@ void let(unit *uptr) {
 		else
 			init_var_stack(var_stack, name, value);
 	}
-	strcpy(uptr->value, value);
+	//strcpy(uptr->value, value);
 }
 
 void no_eval(unit *uptr) {
