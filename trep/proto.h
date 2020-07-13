@@ -75,7 +75,8 @@ void output(unit *),
 	 more_or_equal(unit *uptr),
 	 less_or_equal(unit *uptr),
 	 more(unit *uptr),
-	 less(unit *uptr);
+	 less(unit *uptr),
+	 equal(unit *uptr);
 
 /* var.c */
 var *new_var_area(int);
