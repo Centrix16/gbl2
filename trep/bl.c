@@ -301,7 +301,7 @@ void eval(unit *uptr) {
 
 void more_or_equal(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) >= result;
@@ -318,7 +318,7 @@ void more_or_equal(unit *uptr) {
 
 void less_or_equal(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) <= result;
@@ -335,7 +335,7 @@ void less_or_equal(unit *uptr) {
 
 void more(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) > result;
@@ -352,7 +352,7 @@ void more(unit *uptr) {
 
 void less(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) < result;
@@ -369,7 +369,7 @@ void less(unit *uptr) {
 
 void equal(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) == result;
@@ -386,7 +386,7 @@ void equal(unit *uptr) {
 
 void no_equal(unit *uptr) {
 	int result = 0;
-	char result_str[64];
+	char result_str[2] = "";
 
 	if (uptr->child_num == 1)
 		result = atof(get_child(uptr, 0)->value) != result;
