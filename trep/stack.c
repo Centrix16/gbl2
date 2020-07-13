@@ -7,6 +7,7 @@ void init_elm(elm *eptr, elm *bottom) {
 	eptr->prev = bottom;
 	eptr->next = NULL;
 	eptr->heap = NULL;
+	eptr->var_indx = 0;
 }
 
 void add_next(elm *eptr) {
