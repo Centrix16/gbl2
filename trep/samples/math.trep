@@ -1,0 +1,6 @@
+~ "Trep uses prefix notation to write mathematical expressions"
+~ "The calculation result is returned by the function"
+
+~ "Let's try to calculate: 15 / 3 * 2 + 8 - 9"
+let (result)(- (+ (* (/ (15)(3))(2))(8))(9))
+output "15 / 3 * 2 + 8 - 9 = " (result) (~n)

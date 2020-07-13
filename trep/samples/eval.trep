@@ -1,0 +1,2 @@
+~ "Trep also has an `eval` function that allows you to dynamically execute expressions"
+eval (input ())

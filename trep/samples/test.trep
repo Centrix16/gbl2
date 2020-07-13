@@ -1,6 +1,0 @@
-let (a)(2)
-output "2+8=" (pow (a)(8)) (~n)
-let (name)("User") ~ "variable creation"
-output "Enter your name: "
-let (; (name))(input)
-output "Hello, " (name) (~n)

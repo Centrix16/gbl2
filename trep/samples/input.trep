@@ -1,0 +1,11 @@
+~ "Input is performed using the `input` function, which returns the value entered by the user as a result"
+
+~ "As a single argument, you can pass a read stream (out / in / err)"
+input (in)
+
+~ "If the read stream is `in` -- then you don't need to pass the stream:"
+input ()
+
+~ "Example of a greeting program:"
+output "Enter you name: "
+output "Hello, " (input ()) (~n)

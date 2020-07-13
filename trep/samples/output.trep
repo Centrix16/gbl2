@@ -1,0 +1,13 @@
+~ "Output to the screen"
+
+~ "The `output ' function accepts the output stream as the first optional argument: out / in / err"
+output (err) "This will be output to the error stream" (~n)
+
+~ "If output occurs in the `out` stream then you don't have to write it:"
+output "This will be output to the `out` stream by default" (~n)
+
+~ "Then follow the lines for output"
+output "First" ", " "Second" ", " "End." (~n)
+
+~ "You can also pass output modifiers `~t` -- tab, `~n` -- newline"
+output "First line" (~n) (~t) "Second line with tab"

@@ -1,0 +1,10 @@
+~ "The `let` function is responsible for creating and assigning values to variables"
+
+~ "Creating the variable `a` and assigning it the value 12"
+let (a)(12)
+output "a = " (a) (~n)
+
+~ "Change the value from 12 to `some value`"
+~ "Since the trep interpreter tries to calculate everything, we need to prevent the variable name from being calculated. to do this, we use the `;`function"
+let (; (a))("some value")
+output "a = " (a) (~n)
