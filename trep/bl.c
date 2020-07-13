@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more};
 
 extern elm *var_stack;
 extern int line;
@@ -297,4 +297,22 @@ void eval(unit *uptr) {
 		//crawl_tree(uptr, show_tree);
 		crawl_tree(uptr, exec);
 	}
+}
+
+void more(unit *uptr) {
+	int result = 0;
+	double tmp = 0;
+	char result_str[64];
+
+	if (uptr->child_num == 1)
+		result = atof(get_child(uptr, 0)->value) > result;
+
+	for (int i = 0; i < uptr->child_num - 1; i++)
+		if (!result && i)
+			break;
+		else
+			result = atof(get_child(uptr, i)->value) > atof(get_child(uptr, i+1)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
 }
