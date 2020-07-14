@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "==", "!=", "!"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "==", "!=", "!", "&&", "and"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, andop};
 
 extern elm *var_stack;
 extern int line;
@@ -405,8 +405,21 @@ void notop(unit *uptr) {
 	int result = 0;
 	char result_str[2] = "";
 
-	if (uptr->child_num) {
+	if (uptr->child_num)
 		result = atof(get_child(uptr, 0)->value) ? 0 : 1;
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void andop(unit *uptr) {
+	int result = 1;
+	char result_str[2];
+
+	for (int i = 0; i < uptr->child_num; i++) {
+		result = result && atof(get_child(uptr, i)->value);
+		if (!result)
+			break;
 	}
 
 	sprintf(result_str, "%d", result);
