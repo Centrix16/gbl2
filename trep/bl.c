@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "==", "!="};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "==", "!=", "!"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop};
 
 extern elm *var_stack;
 extern int line;
@@ -396,6 +396,18 @@ void no_equal(unit *uptr) {
 			break;
 		else
 			result = atof(get_child(uptr, i)->value) != atof(get_child(uptr, i+1)->value);
+
+	sprintf(result_str, "%d", result);
+	strcpy(uptr->value, result_str);
+}
+
+void notop(unit *uptr) {
+	int result = 0;
+	char result_str[2] = "";
+
+	if (uptr->child_num) {
+		result = atof(get_child(uptr, 0)->value) ? 0 : 1;
+	}
 
 	sprintf(result_str, "%d", result);
 	strcpy(uptr->value, result_str);
