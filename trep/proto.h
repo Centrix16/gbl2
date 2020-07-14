@@ -78,7 +78,8 @@ void output(unit *),
 	 less(unit *uptr),
 	 equal(unit *uptr),
 	 no_equal(unit *uptr),
-	 notop(unit *uptr);
+	 notop(unit *uptr),
+	 andop(unit *uptr);
 
 /* var.c */
 var *new_var_area(int);
