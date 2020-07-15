@@ -1,0 +1,9 @@
+let (a)(15) (b)(15)
+
+? (> (a)(b))(; (
+	output "a > b" (~n)
+  ))
+  (< (a)(b))(; (
+	output "a < b" (~n)
+  ))
+  (; (output "So, I guess: a = b" (~n)))
