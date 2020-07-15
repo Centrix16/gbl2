@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "proto.h"
+#include "unilog.h"
 
 unit root;
 elm bottom, *var_stack;
@@ -31,6 +32,9 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
+	log_mode("w");
+	target("log");
+
 	heap = new_var_area(256);
 	init_elm(&bottom, NULL);
 	var_stack = &bottom;
@@ -47,20 +51,29 @@ int main(int argc, char *argv[]) {
 	crawl_tree(&root, del_tree);
 	crawl_stack(&bottom, del_elm);
 	del_var_area(heap);
+
+	end();
 	return 0;
 }
 
 void error(int err_line, int type, char *token) {
+	log("%s: err_line = %d, type = %d, token = `%s`\n", __func__, err_line, type, token);	
+
 	printf("Error, line %d: `%s`: %s\n", err_line, token, err_messages[type]);
 }
 
 void interpret(char *filename) {
 	FILE *src = fopen(filename, "r");
+
+	log("%s: filename = %s\n", __func__, filename);
+
 	pars(src, NULL, &root);
 	fclose(src);
 }
 
 void clear_buf(char *buf, int len) {
+	log("%s: buf = `%s`, len = %d\n", __func__, buf, len);
+
 	for (int i = 0; i < len; i++)
 		if (buf[i])
 			buf[i] = 0;	
@@ -69,6 +82,8 @@ void clear_buf(char *buf, int len) {
 void pars_file(FILE *fptr, unit *uptr) {
 	char buf[LEN] = "\0";
 	int c = 0, is_quote = 0, sticking = 0, i = 0, type = PARENT;
+
+	log("%s: fptr = %p, uptr = %p\n", __func__, fptr, uptr);
 
 	if (feof(fptr))
 		return ;	
@@ -171,8 +186,10 @@ void pars_str(char *str, unit *uptr) {
 	char buf[LEN] = "\0";
 	int c = 0, is_quote = 0, sticking = 0, i = 0, j = 0, type = PARENT;
 
+	log("%s: str = `%s`, uptr = %p\n", __func__, str, uptr);
+
 	if (!*str)
-		return ;	
+		return ;
 
 	c = str[j++];
 	while (str[j-1]) {
@@ -264,6 +281,8 @@ void pars_str(char *str, unit *uptr) {
 }
 
 void pars(FILE *fptr, char *str, unit *uptr) {
+	log("%s: fptr = %p, str = `%s`, uptr = %p\n", __func__, fptr, str, uptr);	
+
 	if (!fptr && !str)
 		return ;
 	else if (fptr)
@@ -272,8 +291,19 @@ void pars(FILE *fptr, char *str, unit *uptr) {
 		pars_str(str, uptr);
 }
 
+int semicolon = 0;
+
 int is_complex_token(char *tok) {
 	int i = 0, is_quote = 0;
+
+	log("%s: tok = `%s`\n", __func__, tok);
+
+	if (!strcmp(tok, ";") || semicolon == 1) {
+		semicolon++;
+		return 0;
+	}
+	if (semicolon == 2)
+		semicolon = 0;
 
 	while (tok[i]) {
 		if (tok[i] == '\"')
@@ -288,11 +318,16 @@ int is_complex_token(char *tok) {
 int nesting = 0, is_parent = 0;
 
 void set_is_parent(int new) {
+	log("%s: new = %d\n", __func__, new);	
+
 	is_parent = new;
 }
 
 void tree_builder(char *token, int type, unit *uptr) {
+	log("%s: token = `%s`, type = %d, uptr = %p\n", __func__, token, type, uptr);	
 	if (type == PARENT) {
+		if (!strcmp(token, ";"))
+			semicolon++;	
 		if (is_parent && !nesting) {
 			//crawl_tree(uptr, show_tree);
 			crawl_tree(uptr, exec);
