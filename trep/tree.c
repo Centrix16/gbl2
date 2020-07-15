@@ -47,7 +47,6 @@ void new_child(unit *parent) {
 }
 
 void set_value(unit *uptr, char *new_value) {
-//	sprintf(uptr->value, "%s", new_value);	
 	strcpy(uptr->value, new_value);
 }
 
@@ -87,7 +86,7 @@ void crawl_tree(unit *parent, void (*func)(unit*)) {
 
 void show_tree(unit *uptr) {
 	if (uptr)
-		printf("%s: ", __func__, uptr->value);
+		printf("%s: %s\n", __func__, uptr->value);
 }
 
 void del_tree(unit *uptr) {
