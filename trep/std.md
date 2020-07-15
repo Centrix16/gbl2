@@ -47,6 +47,11 @@ lay1
   + `eval(expr)` -- вычисление выражения expr, по факту - eval интерпретатор trep / layp
   + `;(expr)` -- запрет вычисления
   + `~ "text"` -- комментарий
+  + `> / < / = / !=` -- функции сравнения принимают 2 аргумента, возвращают 1 | 0
+  + `& / | / !` -- логические функции принимают N аргументов, возвращают 1 | 0
+  + `?` -- ветвление
+  + `while` -- цикл while
+  + `for` -- цикл for
 
 ## Деревья функций
 
@@ -93,15 +98,48 @@ lay1
   // ;
   ;
    expr
+
+  // cmp
+  < / > / = / !=
+   arg1
+   arg2
+
+  // logic
+  & / | / !
+   arg1
+   ...
+   argN
+
+  // ?
+  ?
+   cond1
+   body1
+   ...
+   condN
+   bodyN
+   ...
+   else-body
+
+  // while
+  while
+   cond
+   body
+
+  // for
+  for
+   var_init
+   cond
+   inc
+   body
   ```
 
 ## Пример кода на trep
   ```
   let (a)(12) (b)(13)
 
-  def (calc)(op1 op2) "
+  def (calc)(op1 op2) ( ; (
      return (+ (op1)(op2))  
-  "
+  ))
 
   let (result)(calc (a)(b))
   output (result)
