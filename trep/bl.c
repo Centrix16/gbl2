@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "==", "!=", "!", "&&", "and", "||", "or"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, andop, orop, orop};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching};
 
 extern elm *var_stack;
 extern int line;
@@ -158,7 +158,7 @@ void let(unit *uptr) {
 		else
 			init_var_stack(var_stack, name, value);
 	}
-	//strcpy(uptr->value, value);
+	strcpy(uptr->value, value);
 }
 
 void no_eval(unit *uptr) {
@@ -284,7 +284,6 @@ void eval(unit *uptr) {
 
 	if (uptr->child_num) {
 		strcpy(tmp_buf, get_child(uptr, 0)->value);
-		strcpy(uptr->value, "\0");
 
 		del_tree(get_child(uptr, 0));
 
@@ -294,7 +293,6 @@ void eval(unit *uptr) {
 
 		set_is_parent(0);
 		pars(NULL, tmp_buf, uptr);
-		//crawl_tree(uptr, show_tree);
 		crawl_tree(uptr, exec);
 	}
 }
@@ -438,4 +436,52 @@ void orop(unit *uptr) {
 
 	sprintf(result_str, "%d", result);
 	strcpy(uptr->value, result_str);
+}
+
+void branching(unit *uptr) {
+	char *cond = NULL, *body = NULL;
+	char tmp_buf[256] = "";
+	int limit = uptr->child_num;
+
+	if ((limit % 2) != 0)
+		limit--;
+
+	for (int i = 0; i < limit; i += 2) {
+		cond = get_child(uptr, i)->value;
+		body = get_child(uptr, i+1)->value;
+
+		if (!strcmp(cond, "1")) {
+			strcpy(tmp_buf, body);
+
+			uptr->is_free = 1; // to avoid deleting yourself
+			crawl_tree(uptr, del_tree);
+			uptr->is_free = 0;
+
+			uptr->i = 0;
+			uptr->child_num = 0;
+			uptr->eval_me = 1;			
+
+			set_is_parent(0);
+			pars(NULL, tmp_buf, uptr);
+			crawl_tree(uptr, exec);
+
+			return ;
+		}
+	}
+
+	if (limit < uptr->child_num) {
+		strcpy(tmp_buf, get_child(uptr, uptr->child_num-1)->value);
+
+		uptr->is_free = 1; // to avoid deleting yourself
+		crawl_tree(uptr, del_tree);
+		uptr->is_free = 0;
+
+		uptr->i = 0;
+		uptr->child_num = 0;
+		uptr->eval_me = 1;			
+
+		set_is_parent(0);
+		pars(NULL, tmp_buf, uptr);
+		crawl_tree(uptr, exec);
+	}
 }
