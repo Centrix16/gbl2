@@ -29,8 +29,8 @@ void free_var_area(var *vptr) {
 }
 
 void init_var(var *vptr, int indx, char *name, char *val) {
-	vptr[indx].name = calloc((strlen(name)+1), sizeof(char));
-	vptr[indx].value = calloc((strlen(val)+1), sizeof(char));
+	vptr[indx].name = malloc((strlen(name)+1) * sizeof(char));
+	vptr[indx].value = malloc((strlen(val)+1) * sizeof(char));
 
 	strcpy(vptr[indx].name, name);
 	strcpy(vptr[indx].value, val);
@@ -40,8 +40,8 @@ void init_var_stack(elm *stack, char *name, char *val) {
 	var *vptr = stack->heap;	
 	int indx = stack->var_indx;
 
-	vptr[indx].name = calloc(strlen(name), sizeof(char));
-	vptr[indx].value = calloc(strlen(val), sizeof(char));
+	vptr[indx].name = malloc((strlen(name)+1) * sizeof(char));
+	vptr[indx].value = malloc((strlen(val)+1) * sizeof(char));
 
 	strcpy(vptr[indx].name, name);
 	strcpy(vptr[indx].value, val);
