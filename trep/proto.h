@@ -19,7 +19,6 @@ typedef struct __unit__ {
 	char value[LEN];
 	int eval_me;
 	int child_num;
-	int i;
 	int is_free;
 	struct __unit__ *parent;
 	struct __unit__ *child[CHILD_MAX];

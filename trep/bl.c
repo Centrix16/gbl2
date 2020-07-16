@@ -152,7 +152,7 @@ void let(unit *uptr) {
 			vptr = get_var_stack(var_stack, result);
 
 			free(vptr->value);
-			vptr->value = malloc(strlen(value)+1);
+			vptr->value = malloc((strlen(value)+1) * sizeof(char));
 			strcpy(vptr->value, value);
 		}
 		else
@@ -287,7 +287,6 @@ void eval(unit *uptr) {
 
 		del_tree(get_child(uptr, 0));
 
-		uptr->i = 0;
 		uptr->child_num = 0;
 		uptr->eval_me = 1;
 
@@ -443,7 +442,6 @@ void eval_expr(unit *uptr, char *buf) {
 	crawl_tree(uptr, del_tree);
 	uptr->is_free = 0;
 
-	uptr->i = 0;
 	uptr->child_num = 0;
 	uptr->eval_me = 1;
 
@@ -479,19 +477,23 @@ void branching(unit *uptr) {
 }
 
 void while_loop(unit *uptr) {
-	char *cond = NULL, *body = NULL;	
+	char cond[256] = "", body[256] = "";	
 	unit *cond_unit = NULL, *body_unit = NULL;
 
 	if (uptr->child_num == 2) {
-		new_child(uptr);
-		new_child(uptr);
+		cond_unit = get_child(uptr, 0);
+		body_unit = get_child(uptr, 1);
 
-		cond_unit = get_child(uptr, 2);
-		body_unit = get_child(uptr, 3);
+		strcpy(cond, cond_unit->value);
+		strcpy(body, body_unit->value);
 
-		cond = get_child(uptr, 0)->value;
-		body = get_child(uptr, 1)->value;
-
+		eval_expr(cond_unit, cond);
+		while (strcmp(cond_unit->value, "0")) {
+			eval_expr(body_unit, body);
+			eval_expr(cond_unit, cond);
+			
+			printf("cond: %s\n", cond_unit->value);
+		}
 	}
 }
 

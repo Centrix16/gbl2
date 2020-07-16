@@ -329,10 +329,9 @@ void tree_builder(char *token, int type, unit *uptr) {
 		if (!strcmp(token, ";"))
 			semicolon++;	
 		if (is_parent && !nesting) {
-			//crawl_tree(uptr, show_tree);
 			crawl_tree(uptr, exec);
 			crawl_tree(uptr, del_tree);
-			refresh_unit(uptr);
+			init_unit(uptr, uptr);
 
 			set_value(uptr, token);
 		}
@@ -344,10 +343,11 @@ void tree_builder(char *token, int type, unit *uptr) {
 	}
 	else {
 		new_child(uptr);
+		uptr->child_num++;
 
 		if (is_complex_token(token)) {
 			nesting++;
-			pars(NULL, token, uptr->child[uptr->i-1]);
+			pars(NULL, token, uptr->child[uptr->child_num-1]);
 			nesting--;
 		}
 		else {
