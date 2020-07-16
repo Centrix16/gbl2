@@ -81,7 +81,8 @@ void output(unit *),
 	 notop(unit *),
 	 andop(unit *),
 	 orop(unit *),
-	 branching(unit *);
+	 branching(unit *),
+	 while_loop(unit *);
 
 /* var.c */
 var *new_var_area(int);
