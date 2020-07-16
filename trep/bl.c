@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop};
 
 extern elm *var_stack;
 extern int line;
@@ -438,6 +438,20 @@ void orop(unit *uptr) {
 	strcpy(uptr->value, result_str);
 }
 
+void eval_expr(unit *uptr, char *buf) {
+	uptr->is_free = 1; // to avoid deleting yourself
+	crawl_tree(uptr, del_tree);
+	uptr->is_free = 0;
+
+	uptr->i = 0;
+	uptr->child_num = 0;
+	uptr->eval_me = 1;
+
+	set_is_parent(0);
+	pars(NULL, buf, uptr);
+	crawl_tree(uptr, exec);
+}
+
 void branching(unit *uptr) {
 	char *cond = NULL, *body = NULL;
 	char tmp_buf[256] = "";
@@ -452,18 +466,7 @@ void branching(unit *uptr) {
 
 		if (!strcmp(cond, "1")) {
 			strcpy(tmp_buf, body);
-
-			uptr->is_free = 1; // to avoid deleting yourself
-			crawl_tree(uptr, del_tree);
-			uptr->is_free = 0;
-
-			uptr->i = 0;
-			uptr->child_num = 0;
-			uptr->eval_me = 1;			
-
-			set_is_parent(0);
-			pars(NULL, tmp_buf, uptr);
-			crawl_tree(uptr, exec);
+			eval_expr(uptr, tmp_buf);
 
 			return ;
 		}
@@ -471,17 +474,23 @@ void branching(unit *uptr) {
 
 	if (limit < uptr->child_num) {
 		strcpy(tmp_buf, get_child(uptr, uptr->child_num-1)->value);
+		eval_expr(uptr, tmp_buf);
+	}
+}
 
-		uptr->is_free = 1; // to avoid deleting yourself
-		crawl_tree(uptr, del_tree);
-		uptr->is_free = 0;
+void while_loop(unit *uptr) {
+	char *cond = NULL, *body = NULL;	
+	unit *cond_unit = NULL, *body_unit = NULL;
 
-		uptr->i = 0;
-		uptr->child_num = 0;
-		uptr->eval_me = 1;			
+	if (uptr->child_num == 2) {
+		new_child(uptr);
+		new_child(uptr);
 
-		set_is_parent(0);
-		pars(NULL, tmp_buf, uptr);
-		crawl_tree(uptr, exec);
+		cond_unit = get_child(uptr, 2);
+		body_unit = get_child(uptr, 3);
+
+		cond = get_child(uptr, 0)->value;
+		body = get_child(uptr, 1)->value;
+
 	}
 }
