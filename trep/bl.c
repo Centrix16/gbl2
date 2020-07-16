@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for"};
+void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop};
 
 extern elm *var_stack;
 extern int line;
@@ -492,5 +492,36 @@ void while_loop(unit *uptr) {
 		cond = get_child(uptr, 0)->value;
 		body = get_child(uptr, 1)->value;
 
+	}
+}
+
+void for_loop(unit *uptr) {
+	char *cond = NULL, *modif = NULL, *body = NULL;
+	unit cond_tree, modif_tree, body_tree;
+
+	if (uptr->child_num != 4)
+		return;
+
+	cond = get_child(uptr, 1)->value;
+	modif = get_child(uptr, 2)->value;
+	body = get_child(uptr, 3)->value;
+
+	init_unit(&cond_tree, NULL); set_value(&cond_tree, cond);
+	init_unit(&modif_tree, NULL); set_value(&modif_tree, modif);
+	init_unit(&body_tree, NULL); set_value(&body_tree, body);
+
+	eval_expr(&cond_tree, cond);
+
+	while (strcmp(cond_tree.value, "0")) {
+		eval_expr(&body_tree, body);
+		crawl_tree(&body_tree, show_tree);
+		eval_expr(&modif_tree, modif);
+		crawl_tree(&body_tree, show_tree);
+
+		crawl_tree(&cond_tree, del_tree); init_unit(&cond_tree, NULL); set_value(&cond_tree, cond);
+		crawl_tree(&modif_tree, del_tree); init_unit(&modif_tree, NULL); set_value(&modif_tree, modif);
+		crawl_tree(&body_tree, del_tree); init_unit(&body_tree, NULL); set_value(&body_tree, body);
+
+		eval_expr(&cond_tree, cond);
 	}
 }
