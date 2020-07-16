@@ -12,21 +12,23 @@
 #include "proto.h"
 
 void init_unit(unit *uptr, unit *new_parent) {
+	if (uptr->child_num) {
+		for (int i = 0; i < uptr->child_num; i++)
+			uptr->child[i] = NULL;	
+	}
+
 	uptr->child_num = 0;
-	uptr->i = 0;
-	uptr->parent = new_parent;
 	uptr->is_free = 0;
 	uptr->eval_me = 1;
 
 	strcpy(uptr->value, "\0");
 
-	for (int i = 0; i < CHILD_MAX; i++) {
-		uptr->child[i] = NULL;
-	}
+	if (new_parent != uptr)
+		uptr->parent = new_parent;
 }
 
 void new_child(unit *parent) {
-	int child_index = parent->i;
+	int child_index = parent->child_num;
 	unit *uptr = NULL;
 
 	if (child_index > CHILD_MAX) {
@@ -42,8 +44,6 @@ void new_child(unit *parent) {
 
 	parent->child[child_index] = uptr;
 	init_unit(parent->child[child_index], parent);
-	parent->child_num++;
-	parent->i++;
 }
 
 void set_value(unit *uptr, char *new_value) {
@@ -90,26 +90,10 @@ void show_tree(unit *uptr) {
 }
 
 void del_tree(unit *uptr) {
-	if (uptr->parent && uptr->is_free == 0) {
-		uptr->child[0] = NULL;
-		uptr->child_num = 0;
-		uptr->i = 0;
-		uptr->is_free = 1;
-		uptr->eval_me = 0;
-		strcpy(uptr->value, "\0");
-
+	if (uptr->parent && uptr->is_free == 0)
 		free(uptr);
-	}
 }
 
 int get_i(unit *uptr) {
-	return uptr->i;
-}
-
-void refresh_unit(unit *uptr) {
-	uptr->i = 0;
-	uptr->child_num = 0;
-	uptr->child[0] = NULL;
-	uptr->eval_me = 1;
-	strcpy(uptr->value, "\0");
+	return uptr->child_num;
 }
