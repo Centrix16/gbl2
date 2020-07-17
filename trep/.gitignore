@@ -1,5 +1,6 @@
 *.exe
 *.swp
+*.swo
 *.coredump
 ti
 log
