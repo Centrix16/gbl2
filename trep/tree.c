@@ -12,17 +12,14 @@
 #include "proto.h"
 
 void init_unit(unit *uptr, unit *new_parent) {
-	if (uptr->child_num) {
-		for (int i = 0; i < uptr->child_num; i++)
-			uptr->child[i] = NULL;	
-	}
-
 	uptr->child_num = 0;
 	uptr->is_free = 0;
 	uptr->eval_me = 1;
 
 	strcpy(uptr->value, "\0");
 
+	for (int i = 0; i < uptr->child_num; i++)
+		uptr->child[i] = NULL;	
 	if (new_parent != uptr)
 		uptr->parent = new_parent;
 }
