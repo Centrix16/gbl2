@@ -88,7 +88,8 @@ void show_tree(unit *uptr) {
 
 void del_tree(unit *uptr) {
 	if (uptr->parent && uptr->is_free == 0)
-		free(uptr);
+		free(uptr)
+	uptr->is_free = 1
 }
 
 int get_i(unit *uptr) {
