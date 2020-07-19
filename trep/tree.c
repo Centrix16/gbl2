@@ -11,9 +11,10 @@
 
 #include "proto.h"
 
+size_t memory = 0;
+
 void init_unit(unit *uptr, unit *new_parent) {
 	uptr->child_num = 0;
-	uptr->is_free = 0;
 	uptr->eval_me = 1;
 
 	strcpy(uptr->value, "\0");
@@ -33,6 +34,7 @@ void new_child(unit *parent) {
 		exit(0);
 	}
 
+	memory += sizeof(unit);
 	uptr = (unit*)malloc(sizeof(unit));
 	if (!uptr) {
 		fprintf(stderr, "%s: malloc fail\n", __func__);
@@ -83,13 +85,14 @@ void crawl_tree(unit *parent, void (*func)(unit*)) {
 
 void show_tree(unit *uptr) {
 	if (uptr)
-		printf("%s: %s\n", __func__, uptr->value);
+		printf("%s: %s (parent = %p)\n", __func__, uptr->value, uptr->parent);
 }
 
 void del_tree(unit *uptr) {
-	if (uptr->parent && uptr->is_free == 0)
-		free(uptr)
-	uptr->is_free = 1
+	if (uptr->parent) {
+		free(uptr);
+		memory -= sizeof(unit);
+	}
 }
 
 int get_i(unit *uptr) {

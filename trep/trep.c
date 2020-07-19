@@ -18,6 +18,7 @@ elm bottom, *var_stack;
 var *heap;
 
 int line = 1;
+extern int memory;
 
 char *err_messages[] = {
 	"there should be a space between the parent and the heir: parent (heir)",
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]) {
 	del_var_area(heap);
 
 	end();
+	printf("\n\n\tmemory = %d\n", memory);
 	return 0;
 }
 

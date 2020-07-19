@@ -281,11 +281,15 @@ void quit(unit *uptr) {
 
 void eval(unit *uptr) {
 	char tmp_buf[256] = "";
+	unit *par = NULL;
 
 	if (uptr->child_num) {
 		strcpy(tmp_buf, get_child(uptr, 0)->value);
 
-		del_tree(get_child(uptr, 0));
+		par = uptr->parent; // To avoid deleting yourself
+		uptr->parent = NULL;
+		crawl_tree(uptr, del_tree);
+		uptr->parent = par;
 
 		uptr->child_num = 0;
 		uptr->eval_me = 1;
@@ -438,9 +442,10 @@ void orop(unit *uptr) {
 }
 
 void eval_expr(unit *uptr, char *buf) {
-	uptr->is_free = 1; // to avoid deleting yourself
+	unit *par = uptr->parent;
+	uptr->parent = NULL;
 	crawl_tree(uptr, del_tree);
-	uptr->is_free = 0;
+	uptr->parent = par;
 
 	uptr->child_num = 0;
 	uptr->eval_me = 1;
@@ -478,21 +483,27 @@ void branching(unit *uptr) {
 
 void while_loop(unit *uptr) {
 	char cond[256] = "", body[256] = "";	
-	unit *cond_unit = NULL, *body_unit = NULL;
+	unit *par = NULL, *work_unit = NULL;
 
 	if (uptr->child_num == 2) {
-		cond_unit = get_child(uptr, 0);
-		body_unit = get_child(uptr, 1);
+		strcpy(cond, get_child(uptr, 0)->value);
+		strcpy(body, get_child(uptr, 1)->value);
 
-		strcpy(cond, cond_unit->value);
-		strcpy(body, body_unit->value);
+		par = uptr->parent;
+		uptr->parent = NULL;
+		crawl_tree(uptr, del_tree);
+		uptr->parent = par;
 
-		eval_expr(cond_unit, cond);
-		while (strcmp(cond_unit->value, "0")) {
-			eval_expr(body_unit, body);
-			eval_expr(cond_unit, cond);
+		init_unit(uptr, uptr);
+		new_child(uptr);
+		work_unit = get_child(uptr, 0);
+
+		eval_expr(work_unit, cond);
+		while (strcmp(work_unit->value, "0")) {
+			eval_expr(work_unit, body);
+			eval_expr(work_unit, cond);
 			
-			printf("cond: %s\n", cond_unit->value);
+			printf("cond: %s\n", work_unit->value);
 		}
 	}
 }
@@ -520,9 +531,12 @@ void for_loop(unit *uptr) {
 		eval_expr(&modif_tree, modif);
 		crawl_tree(&body_tree, show_tree);
 
-		crawl_tree(&cond_tree, del_tree); init_unit(&cond_tree, NULL); set_value(&cond_tree, cond);
-		crawl_tree(&modif_tree, del_tree); init_unit(&modif_tree, NULL); set_value(&modif_tree, modif);
-		crawl_tree(&body_tree, del_tree); init_unit(&body_tree, NULL); set_value(&body_tree, body);
+		crawl_tree(&cond_tree, del_tree);
+		init_unit(&cond_tree, NULL); set_value(&cond_tree, cond);
+		crawl_tree(&modif_tree, del_tree);
+		init_unit(&modif_tree, NULL); set_value(&modif_tree, modif);
+		crawl_tree(&body_tree, del_tree);
+		init_unit(&body_tree, NULL); set_value(&body_tree, body);
 
 		eval_expr(&cond_tree, cond);
 	}
