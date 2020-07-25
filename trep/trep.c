@@ -1,7 +1,7 @@
 /*
  * trep.c -- trep interpreter
- * v0.0
- * 30.06.2020
+ * v0.2
+ * 25.07.2020
  * by asz
  */
 
@@ -12,6 +12,8 @@
 
 #include "proto.h"
 #include "unilog.h"
+
+#define DBG 0
 
 unit root;
 elm bottom, *var_stack;
@@ -41,7 +43,7 @@ int main(int argc, char *argv[]) {
 	var_stack = &bottom;
 	var_stack->heap = heap;
 
-	init_unit(&root, NULL);	
+	unit_init(&root, NULL);	
 
 	interpret(argv[1]);
 
@@ -49,19 +51,23 @@ int main(int argc, char *argv[]) {
 		crawl_tree(&root, exec);
 	}
 
-	crawl_tree(&root, del_tree);
+	free_tree(&root);
 	crawl_stack(&bottom, del_elm);
 	del_var_area(heap);
 
 	end();
+
+#if DBG
 	printf("\n\n\tmemory = %d\n", memory);
+#endif
+
 	return 0;
 }
 
 void error(int err_line, int type, char *token) {
 	log("%s: err_line = %d, type = %d, token = `%s`\n", __func__, err_line, type, token);	
 
-	printf("Error, line %d: `%s`: %s\n", err_line, token, err_messages[type]);
+	fprintf(stderr, "\nError, line %d: `%s`: %s\n", err_line, token, err_messages[type]);
 }
 
 void interpret(char *filename) {
@@ -293,19 +299,10 @@ void pars(FILE *fptr, char *str, unit *uptr) {
 		pars_str(str, uptr);
 }
 
-int semicolon = 0;
-
 int is_complex_token(char *tok) {
 	int i = 0, is_quote = 0;
 
 	log("%s: tok = `%s`\n", __func__, tok);
-
-	if (!strcmp(tok, ";") || semicolon == 1) {
-		semicolon++;
-		return 0;
-	}
-	if (semicolon == 2)
-		semicolon = 0;
 
 	while (tok[i]) {
 		if (tok[i] == '\"')
@@ -328,24 +325,21 @@ void set_is_parent(int new) {
 void tree_builder(char *token, int type, unit *uptr) {
 	log("%s: token = `%s`, type = %d, uptr = %p\n", __func__, token, type, uptr);	
 	if (type == PARENT) {
-		if (!strcmp(token, ";"))
-			semicolon++;	
 		if (is_parent && !nesting) {
 			crawl_tree(uptr, exec);
-			crawl_tree(uptr, del_tree);
-			init_unit(uptr, uptr);
+			free_tree(uptr);
+			unit_init(uptr, uptr);
 
-			set_value(uptr, token);
+			unit_set_value(uptr, token);
 		}
 		else {
-			set_value(uptr, token);
+			unit_set_value(uptr, token);
 			if (!nesting)
 				is_parent = 1;
 		}
 	}
 	else {
-		new_child(uptr);
-		uptr->child_num++;
+		unit_new_child(uptr);
 
 		if (is_complex_token(token)) {
 			nesting++;
@@ -353,7 +347,7 @@ void tree_builder(char *token, int type, unit *uptr) {
 			nesting--;
 		}
 		else {
-			set_value(get_child(uptr, get_i(uptr)-1), token);	
+			unit_set_value(unit_get_child(uptr, unit_get_i(uptr)-1), token);	
 		}
 	}
 }
