@@ -1,6 +1,6 @@
 /*
  * proto.h -- main header file
- * 12.07.2020
+ * 27.07.2020
  * by asz
  */
 
@@ -17,7 +17,7 @@
 
 typedef struct __unit__ {
 	char value[LEN];
-	int eval_me;
+	char *ret_value;
 	int child_num;
 	struct __unit__ *parent;
 	struct __unit__ *child[CHILD_MAX];
@@ -44,17 +44,17 @@ void tree_builder(char *, int, unit *);
 void set_is_parent(int new);
 
 /* tree.c */
-void init_unit(unit *, unit *);
-void new_child(unit *);
-void set_value(unit *, char *);
-unit *get_child(unit *, int);
-void set_end(unit *);
-int is_end_unit(unit *);
+void unit_init(unit *, unit *);
+void unit_new_child(unit *);
+void unit_set_value(unit *, char *);
+unit *unit_get_child(unit *, int);
+int unit_is_end(unit *);
 void crawl_tree(unit *, void (*)(unit*));
-void show_tree(unit *);
-void del_tree(unit *);
-int get_i(unit *);
-void refresh_unit(unit *);
+void unit_show(unit *);
+void unit_free(unit *);
+int unit_get_i(unit *);
+void unit_set_ret_value(unit *, char *);
+void free_tree(unit *uptr);
 
 /* bl.c */
 void exec(unit *);
