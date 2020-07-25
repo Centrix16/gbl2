@@ -22,10 +22,10 @@ r:
 	$(ct) $(flags) $(out) $(src)
 
 test:
+	./$(out) $(dir)/output.trep
+	./$(out) $(dir)/input.trep
+	./$(out) $(dir)/var.trep
+	./$(out) $(dir)/math.trep
+	./$(out) $(dir)/logic.trep
 	./$(out) $(dir)/eval.trep
 	./$(out) $(dir)/if.trep
-	./$(out) $(dir)/input.trep
-	./$(out) $(dir)/logic.trep
-	./$(out) $(dir)/math.trep
-	./$(out) $(dir)/output.trep
-	./$(out) $(dir)/var.trep
