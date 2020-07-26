@@ -82,10 +82,9 @@ void crawl_tree(unit *parent, void (*func)(unit*)) {
 	(*func)(uptr);
 }
 
-
 void unit_show(unit *uptr) {
 	if (uptr)
-		printf("%s: %s (parent = %p)\n", __func__, uptr->value, uptr->parent);
+		printf("%s\n", uptr->value);
 }
 
 void unit_free(unit *uptr) {
@@ -128,6 +127,14 @@ void free_tree(unit *uptr) {
 	force_crawl = 1;
 
 	crawl_tree(uptr, unit_free);
+
+	force_crawl = 0;
+}
+
+void print_tree(unit *uptr) {
+	force_crawl = 1;
+
+	crawl_tree(uptr, unit_show);
 
 	force_crawl = 0;
 }
