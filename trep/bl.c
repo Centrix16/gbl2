@@ -115,8 +115,14 @@ void output(unit *uptr) {
 			stream = stdin;
 		else if (!strcmp(tmp, "err"))
 			stream = stderr;	
-		else
-			fputs(tmp, stream);
+		else {
+			if (!strcmp(tmp, "~n"))
+				fputc('\n', stream);
+			else if (!strcmp(tmp, "~t"))
+				fputc('\t', stream);
+			else
+				fputs(tmp, stream);
+		}
 
 		i = 1; // first - stream
 	}
@@ -504,51 +510,67 @@ void branching(unit *uptr) {
 	unit_set_ret_value(uptr, "0");
 }
 
-void old_while_loop(unit *uptr) {
+void while_loop(unit *uptr) {
 	unit *cond_unit = NULL, *body_unit = NULL;
-	char *cond = NULL, *body = NULL;
-	char i_str[LEN] = "";
+	char *cond = NULL, *body = NULL,
+		 i_str[LEN] = "";
 	int i = 0;
 
 	if (uptr->child_num == 2) {
-		cond_unit = unit_get_child(uptr, 0);
-		body_unit = unit_get_child(uptr, 1);
+		cond_unit = unit_get_child(uptr, 0);	
+		body_unit = unit_get_child(uptr, 1);	
 
-		cond = cond_unit->ret_value;
+		cond = cond_unit->ret_value;	
 		body = body_unit->value;
-
-		strcpy(body, "\0");
-
-		while (strcmp(cond, "0")) {
-			crawl_tree(body_unit, exec);
-			crawl_tree(cond_unit, exec);
-			i++;
-		}
-
-		strcpy(body, ";");
-	}
-
-	sprintf(i_str, "%d", i);
-	unit_set_ret_value(uptr, i_str);
-	//print_tree(uptr);	
-}
-
-void while_loop(unit *uptr) {
-	char *cond = NULL, *body = NULL;
-
-	if (uptr->child_num == 2) {
-		cond = unit_get_child(uptr, 0)->ret_value;	
-		body = unit_get_child(uptr, 1)->value;
 
 		if (strcmp(cond, "0")) {
 			if (!strcmp(body, ";"))
 				strcpy(body, "\0");	
-			crawl_tree(uptr, exec);
+
+			crawl_tree(body_unit, exec);
+			crawl_tree(cond_unit, exec);
+			i++;
+			while_loop(uptr);
+
 			strcpy(body, ";");
 		}
 	}
+
+	sprintf(i_str, "%d", i);
+	unit_set_ret_value(uptr, i_str);
 }
 
 void for_loop(unit *uptr) {
-	
+	unit *cond_unit = NULL, *body_unit = NULL, *modf_unit = NULL;
+	char *cond = NULL, *body = NULL, *modf = NULL,
+		 i_str[LEN] = "";
+	int i = 0;
+
+	if (uptr->child_num == 4) {
+		cond_unit = unit_get_child(uptr, 1);
+		modf_unit = unit_get_child(uptr, 2);
+		body_unit = unit_get_child(uptr, 3);
+
+		cond = cond_unit->ret_value;
+		body = body_unit->value;
+		modf = modf_unit->value;
+
+		if (strcmp(cond, "0")) {
+			if (!strcmp(body, ";"))
+				strcpy(body, "\0");
+			if (!strcmp(modf, ";"))
+				strcpy(modf, "\0");
+
+			crawl_tree(body_unit, exec);
+			crawl_tree(modf_unit, exec);
+			crawl_tree(cond_unit, exec);
+			i++;
+			for_loop(uptr);
+
+			strcpy(body, ";");
+		}
+	}
+
+	sprintf(i_str, "%d", i);
+	unit_set_ret_value(uptr, i_str);
 }
