@@ -58,7 +58,6 @@ void exec(unit *uptr) {
 
 	result = is_variable(uptr->value);
 	if (result > -1) {
-		//strcpy(uptr->value, get_var_value_stack(var_stack, result));
 		unit_set_ret_value(uptr, get_var_value_stack(var_stack, result));
 		return ;
 	}
@@ -139,8 +138,12 @@ void let(unit *uptr) {
 	char *value = NULL;
 	int result = 0;
 	var *vptr = NULL;
+	int limit = uptr->child_num;
 
-	for (int i = 0; i < uptr->child_num; i += 2) {
+	if ((limit % 2) != 0)
+		limit--;	
+
+	for (int i = 0; i < limit; i += 2) {
 		name = unit_get_child(uptr, i)->value;
 		value = unit_get_child(uptr, i+1)->ret_value;
 
@@ -297,157 +300,176 @@ void eval(unit *uptr) {
 }
 
 void more_or_equal(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;	
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) >= result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) >= atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) >= atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void less_or_equal(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) <= result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) <= atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) <= atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void more(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) > result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) > atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) > atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void less(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) < result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) < atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) < atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void equal(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) == result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) == atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) == atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void no_equal(unit *uptr) {
-	int result = 0;
+	char *op1 = NULL, *op2 = NULL;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num == 1)
 		result = atof(unit_get_child(uptr, 0)->ret_value) != result;
 
-	for (int i = 0; i < uptr->child_num - 1; i++)
+	for (int i = 0; i < uptr->child_num - 1; i++) {
+		op1 = unit_get_child(uptr, i)->ret_value;
+		op2 = unit_get_child(uptr, i+1)->ret_value;
+
 		if (!result && i)
 			break;
 		else
-			result = atof(unit_get_child(uptr, i)->ret_value) != atof(unit_get_child(uptr, i+1)->ret_value);
+			result = atof(op1) != atof(op2);
+	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void notop(unit *uptr) {
-	int result = 0;
 	char result_str[2] = "";
+	double result = 0;
 
 	if (uptr->child_num)
 		result = atof(unit_get_child(uptr, 0)->ret_value) ? 0 : 1;
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void andop(unit *uptr) {
-	int result = 1;
 	char result_str[2];
+	double result = 1;
 
 	for (int i = 0; i < uptr->child_num; i++) {
 		result = result && atof(unit_get_child(uptr, i)->ret_value);
+		 
 		if (!result)
 			break;
 	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
 }
 
 void orop(unit *uptr) {
-	int result = 0;
 	char result_str[2];
+	double result = 0;
 
 	for (int i = 0; i < uptr->child_num; i++) {
 		result = result || atof(unit_get_child(uptr, i)->ret_value);
+
 		if (result)
 			break;
 	}
 
-	sprintf(result_str, "%d", result);
+	sprintf(result_str, "%g", result);
 	unit_set_ret_value(uptr, result_str);
-}
-
-void eval_expr(unit *uptr, char *buf) {
-	unit *par = uptr->parent;
-	uptr->parent = NULL;
-	crawl_tree(uptr, unit_free);
-	uptr->parent = par;
-
-	uptr->child_num = 0;
-
-	set_is_parent(0);
-	pars(NULL, buf, uptr);
-	crawl_tree(uptr, exec);
 }
 
 void branching(unit *uptr) {
@@ -466,6 +488,7 @@ void branching(unit *uptr) {
 		if (strcmp(cond, "0")) {
 			strcpy(body, "\0");
 			crawl_tree(body_unit, exec);
+			unit_set_ret_value(uptr, cond);
 			return ;
 		}
 	}
@@ -481,9 +504,49 @@ void branching(unit *uptr) {
 	unit_set_ret_value(uptr, "0");
 }
 
+void old_while_loop(unit *uptr) {
+	unit *cond_unit = NULL, *body_unit = NULL;
+	char *cond = NULL, *body = NULL;
+	char i_str[LEN] = "";
+	int i = 0;
+
+	if (uptr->child_num == 2) {
+		cond_unit = unit_get_child(uptr, 0);
+		body_unit = unit_get_child(uptr, 1);
+
+		cond = cond_unit->ret_value;
+		body = body_unit->value;
+
+		strcpy(body, "\0");
+
+		while (strcmp(cond, "0")) {
+			crawl_tree(body_unit, exec);
+			crawl_tree(cond_unit, exec);
+			i++;
+		}
+
+		strcpy(body, ";");
+	}
+
+	sprintf(i_str, "%d", i);
+	unit_set_ret_value(uptr, i_str);
+	//print_tree(uptr);	
+}
+
 void while_loop(unit *uptr) {
-	crawl_tree(unit_get_child(uptr, 0), unit_show);
-	crawl_tree(unit_get_child(uptr, 1), unit_show);
+	char *cond = NULL, *body = NULL;
+
+	if (uptr->child_num == 2) {
+		cond = unit_get_child(uptr, 0)->ret_value;	
+		body = unit_get_child(uptr, 1)->value;
+
+		if (strcmp(cond, "0")) {
+			if (!strcmp(body, ";"))
+				strcpy(body, "\0");	
+			crawl_tree(uptr, exec);
+			strcpy(body, ";");
+		}
+	}
 }
 
 void for_loop(unit *uptr) {
