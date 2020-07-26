@@ -55,6 +55,7 @@ void unit_free(unit *);
 int unit_get_i(unit *);
 void unit_set_ret_value(unit *, char *);
 void free_tree(unit *uptr);
+void print_tree(unit *uptr);
 
 /* bl.c */
 void exec(unit *);
