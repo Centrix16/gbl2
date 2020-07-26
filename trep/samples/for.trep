@@ -1,3 +1,6 @@
-for (let (i)(0))(; (< (i)(10)))(; (let (; (i)(+ (i)(1)))))(; (
-    output (i) " line" (~n)
-))
+for (let (i)(0)) (< (i)(5)) (; (let (i)(+ (i)(1)))) (; 
+	(for (let (j)(0)) (< (j)(5)) (; (let (j)(+ (j)(1)))) (; 
+		(output (~t) "j = " (j) (~n))
+	))
+	(output "i = " (i) (~n))
+)
