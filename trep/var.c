@@ -79,18 +79,3 @@ char *get_var_value_stack(elm *stack, int indx) {
 var *get_var_stack(elm *stack, int indx) {
 	return &stack->heap[indx];	
 }
-
-/*int main() {
-	var *heap = NULL;
-
-	heap = new_var_area(5);
-
-	init_var(heap, 0, "a", "12");
-	init_var(heap, 1, "b", "5");
-	init_var(heap, 2, "c", "16");
-
-	crawl_heap(heap, show_var);
-
-	del_var_area(heap);
-	return 0;
-}*/
