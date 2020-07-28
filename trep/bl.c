@@ -12,8 +12,8 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for"};
-void (*built_in_funcs[])(unit*) = {output, let, no_eval, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for", "str"};
+void (*built_in_funcs[])(unit*) = {output, let, NULL, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop, str};
 
 extern elm *var_stack;
 extern int line;
@@ -136,6 +136,7 @@ void output(unit *uptr) {
 		else
 			fputs(del_sym(tmp, '\"'), stream);	
 	}
+
 	unit_set_ret_value(uptr, unit_get_child(uptr, i-1)->value);
 }
 
@@ -153,6 +154,9 @@ void let(unit *uptr) {
 		name = unit_get_child(uptr, i)->value;
 		value = unit_get_child(uptr, i+1)->ret_value;
 
+		if (is_str(value))
+			value = del_sym(value, '\"');
+
 		result = is_variable(name);
 		if (result > -1) {
 			vptr = get_var_stack(var_stack, result);
@@ -165,11 +169,6 @@ void let(unit *uptr) {
 			init_var_stack(var_stack, name, value);
 	}
 	unit_set_ret_value(uptr, value);
-}
-
-void no_eval(unit *uptr) {
-	strcpy(uptr->value, uptr->child[0]->value);	
-	crawl_tree(uptr, unit_show);
 }
 
 void input(unit *uptr) {
@@ -264,20 +263,6 @@ void divop(unit *uptr) {
 	unit_set_ret_value(uptr, result_str);
 }
 
-void powop(unit *uptr) {
-	double result = 1;
-	char result_str[64] = "";
-
-	if (uptr->child_num > 1)
-		result = atof(unit_get_child(uptr, 0)->value);
-
-	for (int i = 1; i < uptr->child_num; i++)
-		result = pow(result, atof(unit_get_child(uptr, i)->value));
-
-	sprintf(result_str, "%g", result);
-	unit_set_ret_value(uptr, result_str);
-}
-
 void comment(unit *uptr) { ; }
 
 void quit(unit *uptr) {
@@ -286,22 +271,25 @@ void quit(unit *uptr) {
 }
 
 void eval(unit *uptr) {
-	char tmp_buf[LEN] = "";
-	unit *par = NULL;
+	unit *eval_unit = NULL;
+	char *code = NULL;
 
 	if (uptr->child_num) {
-		strcpy(tmp_buf, unit_get_child(uptr, 0)->ret_value);
+		unit_new_child(uptr);	
 
-		par = uptr->parent; // To avoid deleting yourself
-		uptr->parent = NULL;
-		crawl_tree(uptr, unit_free);
-		uptr->parent = par;
-
-		uptr->child_num = 0;
+		eval_unit = unit_get_child(uptr, uptr->child_num-1);
+		code = unit_get_child(uptr, 0)->ret_value;
 
 		set_is_parent(0);
-		pars(NULL, tmp_buf, uptr);
-		crawl_tree(uptr, exec);
+		eval_unit->parent = NULL;
+
+		pars(NULL, code, eval_unit);
+		crawl_tree(eval_unit, exec);
+		crawl_tree(eval_unit, unit_free);
+
+		uptr->child_num--;
+
+		unit_set_ret_value(uptr, eval_unit->ret_value);
 	}
 }
 
@@ -573,4 +561,74 @@ void for_loop(unit *uptr) {
 
 	sprintf(i_str, "%d", i);
 	unit_set_ret_value(uptr, i_str);
+}
+
+void str(unit *uptr) {
+	char *op = NULL, *count = NULL, *variable = NULL,
+		 *var_value = NULL, *tmp_ptr = NULL, *c = NULL;
+	int indx = 0, len = 0;
+	var *dst = NULL;
+	char ret[LEN] = "";
+	
+	if (uptr->child_num >= 3) {
+		op = unit_get_child(uptr, 0)->ret_value;
+		count = unit_get_child(uptr, 1)->ret_value;
+		variable = unit_get_child(uptr, 2)->value;
+
+		if (is_variable(variable) < 0) {
+			error(line, not_such_var, variable);
+			exit(0);
+		}
+		else
+			dst = get_var_stack(var_stack, is_variable(variable));
+
+		indx = atoi(count);
+		if (indx < 0) {
+			error(line, incorrect_data, count);
+			exit(0);
+		}
+
+		var_value = dst->value;
+		len = strlen(var_value);
+
+		if (!strcmp("set", op)) {
+			if (len < indx) {
+				tmp_ptr = (char*)realloc(var_value, indx+1);
+				if (tmp_ptr) {
+					perror(__func__);
+					exit(0);
+				}
+
+				dst->value = tmp_ptr;
+			}
+
+			c = unit_get_child(uptr, 3)->ret_value;
+			if (is_str(c))
+				c = del_sym(c, '\"');
+			var_value[indx] = *(c);
+
+			strcpy(ret, var_value);
+		}
+		else if (!strcmp("get", op)) {
+			tmp_ptr = var_value;
+
+			if (indx > len) {
+				error(line, incorrect_data, count);
+				exit(0);
+			}
+			else if (indx == len) {
+				tmp_ptr = "0";
+				indx = 0;
+			}
+
+			ret[0] = tmp_ptr[indx];
+			ret[1] = 0;
+		}
+		else {
+			error(line, unk_param, op);
+			exit(0);
+		}
+
+		unit_set_ret_value(uptr, ret);
+	}
 }
