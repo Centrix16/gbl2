@@ -61,7 +61,6 @@ void print_tree(unit *uptr);
 void exec(unit *);
 void output(unit *),
 	 let(unit *),
-	 no_eval(unit *),
 	 input(unit *),
 	 sum(unit *),
 	 sub(unit *),
@@ -82,7 +81,8 @@ void output(unit *),
 	 orop(unit *),
 	 branching(unit *),
 	 while_loop(unit *),
-	 for_loop(unit *);
+	 for_loop(unit *),
+	 str(unit *);
 
 /* var.c */
 var *new_var_area(int);
@@ -105,7 +105,10 @@ enum error_types {
 	space_between_parent_and_child = 0,
 	not_parent,
 	expected_int,
-	nil_div
+	nil_div,
+	not_such_var,
+	unk_param,
+	incorrect_data
 };
 
 #endif
