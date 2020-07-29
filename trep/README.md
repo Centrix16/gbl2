@@ -29,7 +29,7 @@ output "= " (res)(~n)
 ## Installation
 on all platforms, to compile the interpreter (ti), just enter:
 ```
-make
+make release
 ```
 
 After that, the `ti` executable file will appear in the directory
