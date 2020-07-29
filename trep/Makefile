@@ -1,25 +1,32 @@
-ct = gcc
-flags = -O0 -g -Wall -o
-src = trep.c bl.c tree.c var.c stack.c
+ct = gcc # compile tool
+dbg_flags = -O0 -g -Wall -o
+flags = -Wall -o
+src = trep.c bl.c tree.c var.c func.c var_stack.c func_stack.c
 libs = -lm
 out = ti
 dir = samples
 
 all:
-	$(ct) $(flags) $(out) $(src) $(libs)
+	$(ct) $(dbg_flags) $(out) $(src) $(libs)
 
 tree:
-	$(ct) $(flags) t tree.c
+	$(ct) $(dbg_flags) t tree.c
 
 var:
-	$(ct) $(flags) v var.c
+	$(ct) $(dbg_flags) v var.c
 
 stack:
-	$(ct) $(flags) s stack.c
+	$(ct) $(dbg_flags) s stack.c
+
+func:
+	$(ct) $(dbg_flags) f func.c func_stack.c tree.c
 
 r:
 	rm $(out)
-	$(ct) $(flags) $(out) $(src)
+	$(ct) $(dbg_flags) $(out) $(src)
+
+release:
+	$(ct) $(flags) $(out) $(src) $(libs)
 
 test:
 	./$(out) $(dir)/output.trep
@@ -29,3 +36,6 @@ test:
 	./$(out) $(dir)/logic.trep
 	./$(out) $(dir)/eval.trep
 	./$(out) $(dir)/if.trep
+	./$(out) $(dir)/for.trep
+	./$(out) $(dir)/while.trep
+	./$(out) $(dir)/pow.trep
