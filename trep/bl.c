@@ -12,16 +12,27 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for", "str"};
-void (*built_in_funcs[])(unit*) = {output, let, NULL, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop, str};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for", "str", "val", NULL};
+void (*built_in_funcs[])(unit*) = {output, let, NULL, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop, str, val};
 
 extern elm *var_stack;
 extern int line;
 
 /* service functions */
 
+int arr_len(char **arr) {
+	int i = 0;
+
+	while (arr[i]) i++;
+
+	return i;
+}
+
 int find_s(char **arr, char *str) {
-	for (int i = 0; i < sizeof(built_in) / sizeof(char*); i++) {
+	if (!str)
+		return -1;
+
+	for (int i = 0; i < arr_len(arr); i++) {
 		if (!strcmp(arr[i], str)) {
 			return i;
 		}
@@ -48,11 +59,16 @@ int is_user_func(char *tok) {
 }
 
 void exec(unit *uptr) {
-	int result = 0;
+	int result = 0, need_recover = -1;
 
 	result = is_built_in(uptr->value);
 	if (result > -1) {
+		need_recover = is_recoverable_unit(uptr->value);
+
 		(*built_in_funcs[result])(uptr);
+
+		if (need_recover == -1)
+			crawl_tree(uptr, recover);
 		return ;
 	}
 
@@ -98,6 +114,20 @@ int is_int(char *str) {
 		sptr++;
 	}
 	return 1;
+}
+
+int is_recoverable_unit(char *val) {
+	char *list[] = {"val", NULL};
+
+	if (!val)
+		return -1;
+
+	return find_s(list, val);
+}
+
+void recover(unit *uptr) {
+	if (is_recoverable_unit(uptr->ret_value) > -1)
+		strcpy(uptr->value, uptr->ret_value);
 }
 
 /* lang functions */
@@ -168,6 +198,7 @@ void let(unit *uptr) {
 		else
 			init_var_stack(var_stack, name, value);
 	}
+
 	unit_set_ret_value(uptr, value);
 }
 
@@ -206,7 +237,7 @@ void sum(unit *uptr) {
 
 void sub(unit *uptr) {
 	double result = 0;
-	char result_str[64] = "";
+	char result_str[LEN] = "";
 
 	if (!is_int(unit_get_child(uptr, 0)->ret_value))
 			error(line, expected_int, unit_get_child(uptr, 0)->ret_value);
@@ -631,4 +662,23 @@ void str(unit *uptr) {
 
 		unit_set_ret_value(uptr, ret);
 	}
+}
+
+void val(unit *uptr) {
+	char buf[LEN] = "";
+	unit *child = NULL;
+
+	if (uptr->child_num > 1) {
+		child = unit_get_child(uptr, 0);
+
+		strcpy(buf, child->ret_value);
+
+		for (int i = 1; i < uptr->child_num; i++) {
+			child = unit_get_child(uptr, i);	
+			strcat(buf, child->ret_value);
+		}
+	}
+
+	strcpy(uptr->value, buf);
+	unit_set_ret_value(uptr, "val");
 }
