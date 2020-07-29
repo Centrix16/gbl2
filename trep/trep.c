@@ -16,8 +16,12 @@
 #define DBG 0
 
 unit root;
+
 elm bottom, *var_stack;
 var *heap;
+
+func_stack func_bottom, *func_top;
+func *func_heap;
 
 int line = 1;
 extern int memory;
@@ -41,12 +45,15 @@ int main(int argc, char *argv[]) {
 	log_mode("w");
 	target("log");
 
-	heap = new_var_area(256);
 	init_elm(&bottom, NULL);
 	var_stack = &bottom;
-	var_stack->heap = heap;
+	var_stack->heap = new_var_area(LEN);
 
 	unit_init(&root, NULL);	
+
+	fs_init(&func_bottom, NULL);
+	func_top = &func_bottom;
+	func_top->heap = func_init_heap(LEN);
 
 	interpret(argv[1]);
 
@@ -55,8 +62,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	free_tree(&root);
-	crawl_stack(&bottom, del_elm);
-	del_var_area(heap);
+	del_var_area(var_stack->heap);
+	crawl_stack(var_stack, del_elm);
+
+	func_free_heap(func_top->heap);
+	fs_crawl_stack(func_top, fs_del);
 
 	end();
 
