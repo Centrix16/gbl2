@@ -58,7 +58,12 @@ void free_tree(unit *uptr);
 void print_tree(unit *uptr);
 
 /* bl.c */
+/* service */
 void exec(unit *);
+int is_recoverable_unit(char *);
+void recover(unit *);
+
+/* lang */
 void output(unit *),
 	 let(unit *),
 	 input(unit *),
@@ -82,7 +87,8 @@ void output(unit *),
 	 branching(unit *),
 	 while_loop(unit *),
 	 for_loop(unit *),
-	 str(unit *);
+	 str(unit *),
+	 val(unit *);
 
 /* var.c */
 var *new_var_area(int);
