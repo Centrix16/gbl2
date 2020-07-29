@@ -1,0 +1,6 @@
+output "Welcome to TREP-LINE!" (~n)(~n)
+
+while (1)(; 
+	(output (out) "> ")
+	(output (out) "= " (eval (input ())) (~n))
+)
