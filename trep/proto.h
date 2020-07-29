@@ -30,11 +30,23 @@ typedef struct __var__ {
 
 typedef struct __elm__ {
 	var *heap;
-	char *tag;
 	int var_indx;
 	struct __elm__ *prev;
 	struct __elm__ *next;
 } elm;
+
+typedef struct __function__ {
+	char *name;
+	char *args;
+	unit *body;
+} func;
+
+typedef struct __func_stack__ {
+	func *heap;
+	int func_indx;
+	struct __func_stack__ *prev;
+	struct __func_stack__ *next;
+} func_stack;
 
 /* trep.c */
 void error(int, int, char*);
@@ -54,8 +66,10 @@ void unit_show(unit *);
 void unit_free(unit *);
 int unit_get_i(unit *);
 void unit_set_ret_value(unit *, char *);
-void free_tree(unit *uptr);
-void print_tree(unit *uptr);
+void free_tree(unit *);
+void print_tree(unit *);
+void unit_copy(unit *, unit *);
+void tree_copy(unit **, unit *);
 
 /* bl.c */
 /* service */
@@ -100,12 +114,24 @@ void show_var(var *);
 char *get_var_value_stack(elm *stack, int indx);
 var *get_var_stack(elm *stack, int indx);
 
-/* stack.c */
+/* var_stack.c */
 void init_elm(elm *, elm *);
 void add_next(elm *);
 void del_elm(elm *);
 void crawl_stack(elm *, void (*)(elm*));
-void show_elm(elm *);
+
+/* func.c */
+func *func_init_heap(int);
+void func_init_stack(func_stack *, char *, char *, unit *);
+void func_free_heap(func *);
+void func_crawl_heap(func *, void (*)(func*));
+void func_show(func *);
+
+/* func_stack.c */
+void fs_init(func_stack *, func_stack *);
+void fs_add(func_stack *);
+void fs_del(func_stack *);
+void fs_crawl_stack(func_stack *, void (*)(func_stack*));
 
 enum error_types {
 	space_between_parent_and_child = 0,
