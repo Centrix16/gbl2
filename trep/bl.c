@@ -12,10 +12,11 @@
 
 #include "proto.h"
 
-char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for", "str", "val", NULL};
-void (*built_in_funcs[])(unit*) = {output, let, NULL, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop, str, val};
+char *built_in[] = {"output", "let", ";", "input", "~", "exit", "+", "-", "*", "/", "eval", ">=", "<=", ">", "<", "=", "!=", "!", "&", "|", "?", "while", "for", "str", "val", "def", NULL};
+void (*built_in_funcs[])(unit*) = {output, let, NULL, input, comment, quit, sum, sub, mul, divop, eval, more_or_equal, less_or_equal, more, less, equal, no_equal, notop, andop, orop, branching, while_loop, for_loop, str, val, def};
 
 extern elm *var_stack;
+extern func_stack *func_top;
 extern int line;
 
 /* service functions */
@@ -37,6 +38,7 @@ int find_s(char **arr, char *str) {
 			return i;
 		}
 	}
+
 	return -1;
 }
 
@@ -51,15 +53,43 @@ int is_variable(char *tok) {
 		if (!strcmp(vptr[i].name, tok))
 			return i;
 	}
+
 	return -1;
 }
 
 int is_user_func(char *tok) {
-	return -1;	
+	func *fptr = func_top->heap;
+
+	for (int i = 0; i < func_top->func_indx; i++) {
+		if (!strcmp(fptr[i].name, tok))
+			return i;
+	}
+
+	return -1;
+}
+
+int arg_setter(elm *eptr, unit *uptr, char *arg_list) {
+	char *name = NULL;
+	int i = 0;
+
+	name = strtok(arg_list, " ");
+	while (name) {
+		init_var_stack(eptr, name, unit_get_child(uptr, i)->ret_value);
+		name = strtok(NULL, " ");	
+		i++;
+	}
+
+	return i;
+}
+
+char *get_function_ret_value(unit *uptr) {
+	return unit_get_child(uptr, uptr->child_num-1)->ret_value;
 }
 
 void exec(unit *uptr) {
 	int result = 0, need_recover = -1;
+	int args_setted = 0;
+	func *fptr = NULL;
 
 	result = is_built_in(uptr->value);
 	if (result > -1) {
@@ -80,7 +110,31 @@ void exec(unit *uptr) {
 
 	result = is_user_func(uptr->value);
 	if (result > -1) {
-		// code for user func
+		fptr = &func_top->heap[result];
+		
+		/* creating a new viewport */
+		add_next(var_stack);
+		var_stack = var_stack->next;
+		var_stack->heap = new_var_area(LEN);
+
+		/* part of argument processing */
+		args_setted = arg_setter(var_stack, uptr, fptr->args);
+		if (args_setted != uptr->child_num)
+			error(line, arg_error, uptr->value);
+
+		/* part of a function call */
+		strcpy(fptr->body->value, " ");
+		crawl_tree(fptr->body, exec);
+		strcpy(fptr->body->value, ";");
+
+		/* deleting the new viewport */
+		var_stack = var_stack->prev;
+		del_var_area(var_stack->next->heap);
+		del_elm(var_stack->next);
+
+		/* returning the function value */
+		unit_set_ret_value(uptr, get_function_ret_value(fptr->body));
+
 		return ;
 	}
 
@@ -681,4 +735,15 @@ void val(unit *uptr) {
 
 	strcpy(uptr->value, buf);
 	unit_set_ret_value(uptr, "val");
+}
+
+void def(unit *uptr) {
+	unit *name_unit = NULL, *arg_list_unit = NULL, *body_unit = NULL;
+
+	name_unit = unit_get_child(uptr, 0);
+	arg_list_unit = unit_get_child(uptr, 1);
+	body_unit = unit_get_child(uptr, 2);
+
+	func_init_stack(func_top, name_unit->value, arg_list_unit->value, body_unit);
+	unit_set_ret_value(uptr, name_unit->value);
 }
