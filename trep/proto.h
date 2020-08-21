@@ -102,7 +102,8 @@ void output(unit *),
 	 while_loop(unit *),
 	 for_loop(unit *),
 	 str(unit *),
-	 val(unit *);
+	 val(unit *),
+	 def(unit *);
 
 /* var.c */
 var *new_var_area(int);
@@ -140,7 +141,8 @@ enum error_types {
 	nil_div,
 	not_such_var,
 	unk_param,
-	incorrect_data
+	incorrect_data,
+	arg_error
 };
 
 #endif
