@@ -57,9 +57,13 @@ void free_var(var *vptr, int indx) {
 }
 
 void del_var_area(var *vptr) {
+	if (!vptr)
+		return ;
+
 	for (int i = 0; vptr[i].name; i++) {
 		free_var(vptr, i);
 	}
+
 	free_var_area(vptr);
 }
 
