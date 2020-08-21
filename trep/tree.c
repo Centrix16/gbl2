@@ -139,30 +139,23 @@ void print_tree(unit *uptr) {
 	force_crawl = 0;
 }
 
-void unit_copy(unit *to, unit *from) {
-	if (to && from)
-		strcpy(to->value, from->value);
-	else
-		return ;
-
-	if (to->ret_value && from->ret_value)
-		strcpy(to->ret_value, from->ret_value);
-
-	to->child_num = from->child_num;
-	to->parent = from->parent;
-
-	for (int i = 0; i < from->child_num; i++)
-		to->child[i] = from->child[i];
-}
-
 void tree_copy(unit **dst, unit *src) {
 	if (!src)
 		return ;
-
-	if (!dst)
+	if (!*dst) {
 		*dst = (unit*)malloc(sizeof(unit));
 
-	unit_copy(*dst, src);
-	for (int i = 0; i < src->child_num; i++)
+		if (!*dst)
+			perror(__func__);
+	}
+
+	((*dst))->child_num = src->child_num;
+	(*dst)->parent = src->parent;
+	(*dst)->ret_value = src->ret_value;
+	strcpy((*dst)->value, src->value);
+
+	for (int i = 0; i < src->child_num; i++) {
+		(*dst)->child[i] = NULL; // for memory allocation
 		tree_copy(&((*dst)->child[i]), src->child[i]);
+	}
 }
