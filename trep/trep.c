@@ -33,7 +33,8 @@ char *err_messages[] = {
 	"division by zero detected",
 	"not such a variable",
 	"unknown parameter",
-	"incorrect data"
+	"incorrect data",
+	"problem when processing arguments of the called function"
 };
 
 int main(int argc, char *argv[]) {
