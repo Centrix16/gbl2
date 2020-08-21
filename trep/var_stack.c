@@ -17,8 +17,11 @@ void add_next(elm *eptr) {
 		perror(__func__);
 		exit(0);
 	}
+
 	eptr->next = new;
-	init_elm(eptr->next, eptr);
+	eptr->next->prev = eptr;
+	eptr->heap = NULL;
+	eptr->var_indx = 0;
 }
 
 void del_elm(elm *eptr) {
@@ -33,6 +36,7 @@ void crawl_stack(elm *eptr, void (*func)(elm*)) {
 		(*func)(eptr);	
 		return ;
 	}
+
 	crawl_stack(eptr->next, func);
 	(*func)(eptr);
 }
